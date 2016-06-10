@@ -1,0 +1,140 @@
+==============================================================================
+SWIG et C++
+==============================================================================
+
+Template de function (mymath.hpp)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_template_func/mymath.hpp
+   :language: c
+
+Template de function (mymath.i)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_template_func/mymath.i
+   :language: c
+
+Template de function (demo.py)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_template_func/demo.py
+   :language: c
+
+.. rst-class:: scrollable-code
+
+Template de classe (pair.hxx)
+------------------------------------------------------------------------------
+  
+.. literalinclude:: example/cxx_template_class/pair.hxx
+   :language: c
+
+Template de classe (pair.i)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_template_class/pair.i
+   :language: c
+
+Template de classe (demo.py)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_template_class/demo.py
+   :language: c
+
+Surchage de fonctions
+------------------------------------------------------------------------------
+
+SWIG génère d'aiguillage pour les fonctions surchargées.
+
+Considérons les fonctions ``foo`` surchargées deux fois:
+
+.. literalinclude:: example/cxx_overloaded/foo.hxx
+   :language: c
+
+Script SWIG
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_overloaded/foo.i
+   :language: c
+
+Surchage de fonctions
+------------------------------------------------------------------------------
+
+va générer une fonction d'interface ``_wrap_foo``  qui va tester d'abord le 
+nombre d'arguments:
+
+* S'il y a deux arguments, elle va appeler la fonction ``foo(double a, double b)`` 
+
+* S'il y a un argument, elle test sont type, et appelle ``foo(int a)`` ou
+  ``foo(double a)``.
+
+.. rst-class:: scrollable-code
+
+Surcharge d'opérateurs
+------------------------------------------------------------------------------
+
+Les opérateurs surchargés C++ sont automatiquement interfacés. Par exemple,
+la classes C++ ``Complex`` suivante utilise des opérateurs surchargés:
+
+.. literalinclude:: example/cxx_operator/mycomplex.hxx
+   :language: c
+
+Surcharge d'opérateurs
+------------------------------------------------------------------------------
+
+Les objets Python ``Complex`` peuvent utilisés ses opérateurs, sans avoir
+donné aucune directive à SWIG:
+
+.. literalinclude:: example/cxx_operator/demo.py
+   :language: c
+
+Bibliothèque standard
+------------------------------------------------------------------------------
+
+La bibliothèque de SWIG fournit des typempas pour la structures de données
+de la bibliothèque C++ standard:
+
+* deque
+* list
+* map
+* pair
+* set
+* string
+* vector
+* shared_ptr
+
+Polymorphisme inter-langage
+------------------------------------------------------------------------------
+
+Une bibliothèque peut posséder des fonctions virtuelles implémentables par
+l'utilisateur dans son programme principal. Si le programme principal
+est maintenant écrit en Python, le polymorphisme est inter-langage. SWIG
+supporte cette fonctionnalité.
+
+Polymorphisme inter-langage
+------------------------------------------------------------------------------
+
+Par exemple, la classe ``Foo`` a une méthode ``baz`` qui appelle la méthode
+``bar``, devant être implémentée par l'utilisateur:
+
+.. literalinclude:: example/cxx_cross_lang_polym/foo.hxx
+   :language: c
+
+Polymorphisme inter-langage
+------------------------------------------------------------------------------
+
+SWIG a une fonctionnalité appelé ``directors`` qui permet d'appeler une
+fonction virtuelle implémentée en Python. Cette fonctionnalité doit être
+activée:
+
+.. literalinclude:: example/cxx_cross_lang_polym/foo.i
+   :language: c
+
+Polymorphisme inter-langage
+------------------------------------------------------------------------------
+
+Ce qui permet de créer en Python un class fille de ``Foo``, implémentant
+la méthode ``bar``:
+
+.. literalinclude:: example/cxx_cross_lang_polym/demo.py
+   :language: python
+

@@ -1,0 +1,60 @@
+==============================================================================
+Utilisation de Numpy
+==============================================================================
+
+Utilisation de Numpy
+----------------------------------------
+
+* Listes Python : structures polyvalentes.
+  
+  * Données hétérogènes.
+  * Dynamiques: `append`, `delete`, `insert`.
+
+* Tableaux Numpy : adaptés aux grands tableaux de nombre.
+
+  * Données homogènes.
+  * Mémoire contigüe.
+
+Exercice 3
+----------------------------------------
+
+Réécrire la fonction **mymath_average** pour qu'elle prenne en argument un
+tableau Numpy.
+
+Le fichier **numpy/arrayobject.h** qui définit l'API C/Python pour les
+tableaux numpy doit être inclu.
+
+**import_array()** doit être appelé à l'initialisation du module.
+
+On supposera que le type des données du tableau numpy est **double**.
+
+Exercice 3
+----------------------------------------
+
+.. c:function:: PyArray_Check(op)
+
+    Evaluates true if op is a Python object whose type is a sub-type of
+    PyArray_Type.
+
+
+.. c:function:: char *PyArrayObject.data
+
+    A pointer to the first element of the array. This pointer can (and
+    normally should) be recast to the data type of the array.
+
+Exercice 3
+----------------------------------------
+
+.. c:function:: int PyArrayObject.nd
+
+   An integer providing the number of dimensions for this array. When nd is
+   0, the array is sometimes called a rank-0 array. Such arrays have
+   undefined dimensions and strides and cannot be accessed. NPY_MAXDIMS is
+   the largest number of dimensions for any array.
+
+
+.. c:function:: npy_intp PyArrayObject.dimensions
+
+   An array of integers providing the shape in each dimension as long as nd
+   \geq 1. The integer is always large enough to hold a pointer on the
+   platform, so the dimension size is only limited by memory.

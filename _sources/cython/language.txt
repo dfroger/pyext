@@ -1,0 +1,79 @@
+==============================================================================
+Le langage Cython
+==============================================================================
+
+Programmation objet (mypair.pyx)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/pair/mypair.pyx
+   :language: cython
+
+Programmation objet (setup.py)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/pair/setup.py
+   :language: cython
+
+.. code-block:: bash
+
+   python setup.py build_ext --inplace
+
+Programmation objet (main.py)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/pair/main.py
+   :language: cython
+
+Programmation objet
+------------------------------------------------------------------------------
+
+* héritage de classes
+* property
+* attributs privés (defaut), readonly, public
+* __cinit__, __dealloc__
+
+Programmation générique (fused types)
+------------------------------------------------------------------------------
+
+mymath.pxd:
+
+.. literalinclude:: example/4_mymath_fused/mymath.pxd
+   :language: cython
+
+.. rst-class:: scrollable-code
+
+Programmation générique
+------------------------------------------------------------------------------
+
+mymath.pyx:
+
+.. literalinclude:: example/4_mymath_fused/mymath.pyx
+   :language: cython
+
+.. rst-class:: scrollable-code
+
+Programmation générique
+------------------------------------------------------------------------------
+
+fraction.pyx:
+
+.. literalinclude:: example/4_mymath_fused/fraction.pyx
+   :language: cython
+
+Programmation générique (fused types)
+------------------------------------------------------------------------------
+
+Types disponibles:
+
+* integral : short, int, long
+* floating : float, double
+* numeric : integral, floating, float complex, double complex
+
+Attention : membres de classe non-supportés.
+
+Autres
+------------------------------------------------------------------------------
+
+* Possibilité de dévérouiller le `GIL` (Global Interpreter Lock).
+* Parallelisme en mémoire paratagée : `prange`, utilise `OpenMP`.
+* Déboggeur.

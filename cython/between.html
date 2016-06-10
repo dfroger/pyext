@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Entre C et Python &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="../index.html" />
+    <link rel="up" title="Cython" href="index.html" />
+    <link rel="next" title="Le langage Cython" href="language.html" />
+    <link rel="prev" title="Cython" href="index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="entre-c-et-python">
+
+<h1>Entre C et Python</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="cython">
+
+<h2>Cython</h2>
+
+<ul class="simple">
+<li>Cython est un langage entre C et Python</li>
+<li>Apporte un typage statique comme en C à Python</li>
+<li>Cython compile en C</li>
+<li>Peut interfacer du code C/C++ externe</li>
+<li>Largement utilisé, stable</li>
+<li>Le code C généré est portable (GNU/Linux, Windows, OSX, Python 2, Python 3).</li>
+</ul>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="mymath-pyx">
+
+<h2>mymath.pyx</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pgcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span><span class="o">==</span><span class="mf">0</span> <span class="ow">or</span> <span class="n">b</span><span class="o">==</span><span class="mf">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">&gt;</span> <span class="n">a</span><span class="p">:</span>
+        <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span><span class="n">a</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">a</span> <span class="o">%</span> <span class="n">b</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">b</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="setup-py">
+
+<h2>setup.py</h2>
+
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span>
+<span class="kn">from</span> <span class="nn">Cython.Build</span> <span class="kn">import</span> <span class="n">cythonize</span>
+
+<span class="n">setup</span><span class="p">(</span>
+    <span class="n">ext_modules</span> <span class="o">=</span> <span class="n">cythonize</span><span class="p">(</span><span class="s1">&#39;mymath.pyx&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="utilisation">
+
+<h2>Utilisation</h2>
+
+<div class="highlight-bash"><div class="highlight"><pre><span></span>python setup.py build_ext --inplace
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mymath</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">mymath</span><span class="o">.</span><span class="n">pgcd</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">42</span><span class="p">))</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="explications">
+
+<h2>Explications</h2>
+
+<p>Le code C généré manipule des <code class="docutils literal"><span class="pre">PyObject</span></code>, par exemple:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">__pyx_t_2</span> <span class="o">=</span> PyNumber_Remainder<span class="o">(</span>__pyx_v_a, __pyx_v_b<span class="o">)</span>
+</pre></div>
+</div>
+<p>Cette fonction est fournit par l'API C de Python:</p>
+<dl class="function">
+<dt id="c.PyNumber_Remainder">
+<a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a>* <code class="descname">PyNumber_Remainder</code><span class="sig-paren">(</span><a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a><em>&nbsp;*o1</em>, <a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a><em>&nbsp;*o2</em><span class="sig-paren">)</span></dt>
+<dd><p>Return value: New reference.</p>
+<p>Returns the remainder of dividing o1 by o2, or NULL on failure. This is
+the equivalent of the Python expression o1 % o2.</p>
+</dd></dl>
+
+
+
+
+<div class="slide-no">6</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="exercice-0">
+
+<h2>Exercice 0</h2>
+
+<p>Compiler et utiliser le module <cite>mymath</cite> avec Cython.</p>
+<ul class="simple">
+<li><a class="reference download internal" href="../_downloads/cython-0_mymath.tar.gz" download=""><code class="xref download docutils literal"><span class="pre">Télécharger</span> <span class="pre">l'exercice</span></code></a></li>
+</ul>
+
+
+
+<div class="slide-no">7</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="typage-statique">
+
+<h2>Typage statique</h2>
+
+<p>Les variables <strong>a</strong>, <strong>b</strong> et <strong>x</strong> sont typées.</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pgcd</span><span class="p">(</span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span><span class="o">==</span><span class="mf">0</span> <span class="ow">or</span> <span class="n">b</span><span class="o">==</span><span class="mf">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">&gt;</span> <span class="n">a</span><span class="p">:</span>
+        <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span><span class="n">a</span>
+    <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">x</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">a</span> <span class="o">%</span> <span class="n">b</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">b</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">8</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>Typage statique</h2>
+
+<p>Le code C généré manipule des entier C par exemple:</p>
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">CYTHON_INLINE</span> <span class="kt">int</span> <span class="nf">__Pyx_mod_int</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">a</span> <span class="o">%</span> <span class="n">b</span><span class="p">;</span>
+  <span class="n">r</span> <span class="o">+=</span> <span class="p">((</span><span class="n">r</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">((</span><span class="n">r</span> <span class="o">^</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">))</span> <span class="o">*</span> <span class="n">b</span><span class="p">;</span>
+  <span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">(...)</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">unlikely</span><span class="p">(</span><span class="n">__pyx_v_b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">PyErr_SetString</span><span class="p">(</span><span class="n">PyExc_ZeroDivisionError</span><span class="p">,</span>
+                  <span class="s">&quot;integer division or modulo by zero&quot;</span><span class="p">);</span>
+  <span class="p">{</span><span class="n">__pyx_filename</span> <span class="o">=</span> <span class="n">__pyx_f</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="n">__pyx_lineno</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+   <span class="n">__pyx_clineno</span> <span class="o">=</span> <span class="n">__LINE__</span><span class="p">;</span>
+   <span class="k">goto</span> <span class="n">__pyx_L1_error</span><span class="p">;}</span>
+<span class="p">}</span>
+<span class="n">__pyx_v_x</span> <span class="o">=</span> <span class="n">__Pyx_mod_int</span><span class="p">(</span><span class="n">__pyx_v_a</span><span class="p">,</span> <span class="n">__pyx_v_b</span><span class="p">);</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">9</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Typage statique</h2>
+
+<p>Bien que manipulation des entiers C, l'opération modulo reste fidèle
+au comportement en pure Python:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Une exception est lancée si le dénominateur est nul.</li>
+<li>En Python: 3 % -2 vaut -1</li>
+<li>En C: 3 % -2 vaut 1</li>
+</ul>
+</div></blockquote>
+<p>Cython étant un langage entre le Python et le C, on peut choisir le
+comportement C.</p>
+
+
+
+<div class="slide-no">10</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>Typage statique</h2>
+
+<p>On utilise la division (et le modulo) à la <code class="docutils literal"><span class="pre">C</span></code>.</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="nn">cython</span>
+
+<span class="nd">@cython</span><span class="o">.</span><span class="n">cdivision</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">pgcd</span><span class="p">(</span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span><span class="o">==</span><span class="mf">0</span> <span class="ow">or</span> <span class="n">b</span><span class="o">==</span><span class="mf">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">&gt;</span> <span class="n">a</span><span class="p">:</span>
+        <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span><span class="n">a</span>
+    <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">x</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">a</span> <span class="o">%</span> <span class="n">b</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">b</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">11</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id4">
+
+<h2>Typage statique</h2>
+
+<p>Dans ce cas, le code généré par Cython contient simplement pour
+l'opération modulo:</p>
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="n">__pyx_v_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">__pyx_v_a</span> <span class="o">%</span> <span class="n">__pyx_v_b</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>On peut ainsi obtenir en Cython des performances semblables au C,
+mais il reste le surcoût d'appel de la fonction.</p>
+
+
+
+<div class="slide-no">12</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="typage-statique-complet">
+
+<h2>Typage statique complet</h2>
+
+<p>On définit la fonction avec <strong>cdef</strong>, et on type la valeur de retour:</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="nn">cython</span>
+
+<span class="nd">@cython</span><span class="o">.</span><span class="n">cdivision</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">cdef</span> <span class="kt">int</span> <span class="nf">pgcd</span><span class="p">(</span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span><span class="o">==</span><span class="mf">0</span> <span class="ow">or</span> <span class="n">b</span><span class="o">==</span><span class="mf">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">&gt;</span> <span class="n">a</span><span class="p">:</span>
+        <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span><span class="n">a</span>
+    <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">x</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">a</span> <span class="o">%</span> <span class="n">b</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">b</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">13</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="id5">
+
+<h2>Typage statique complet</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="k">static</span> <span class="kt">int</span> <span class="nf">__pyx_f_6mymath_pgcd</span><span class="p">(</span><span class="kt">int</span> <span class="n">__pyx_v_a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">__pyx_v_b</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">__pyx_v_x</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">__pyx_r</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">__pyx_t_1</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">__pyx_t_2</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">__pyx_t_3</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">__pyx_t_4</span><span class="p">;</span>
+
+  <span class="n">__pyx_t_2</span> <span class="o">=</span> <span class="p">((</span><span class="n">__pyx_v_a</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">__pyx_t_2</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">__pyx_t_1</span> <span class="o">=</span> <span class="n">__pyx_t_2</span><span class="p">;</span>
+    <span class="k">goto</span> <span class="n">__pyx_L4_bool_binop_done</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">__pyx_t_2</span> <span class="o">=</span> <span class="p">((</span><span class="n">__pyx_v_b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">__pyx_t_1</span> <span class="o">=</span> <span class="n">__pyx_t_2</span><span class="p">;</span>
+  <span class="nl">__pyx_L4_bool_binop_done</span><span class="p">:;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">__pyx_t_1</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="n">__pyx_r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">goto</span> <span class="n">__pyx_L0</span><span class="p">;</span>
+
+  <span class="p">}</span>
+
+  <span class="n">__pyx_t_1</span> <span class="o">=</span> <span class="p">((</span><span class="n">__pyx_v_b</span> <span class="o">&gt;</span> <span class="n">__pyx_v_a</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">__pyx_t_1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">__pyx_t_3</span> <span class="o">=</span> <span class="n">__pyx_v_b</span><span class="p">;</span>
+    <span class="n">__pyx_t_4</span> <span class="o">=</span> <span class="n">__pyx_v_a</span><span class="p">;</span>
+    <span class="n">__pyx_v_a</span> <span class="o">=</span> <span class="n">__pyx_t_3</span><span class="p">;</span>
+    <span class="n">__pyx_v_b</span> <span class="o">=</span> <span class="n">__pyx_t_4</span><span class="p">;</span>
+
+  <span class="p">}</span>
+
+  <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="n">__pyx_v_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">__pyx_v_a</span> <span class="o">%</span> <span class="n">__pyx_v_b</span><span class="p">);</span>
+
+    <span class="n">__pyx_t_1</span> <span class="o">=</span> <span class="p">((</span><span class="n">__pyx_v_x</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">__pyx_t_1</span><span class="p">)</span> <span class="p">{</span>
+
+      <span class="k">goto</span> <span class="n">__pyx_L8_break</span><span class="p">;</span>
+
+    <span class="p">}</span>
+
+    <span class="n">__pyx_v_a</span> <span class="o">=</span> <span class="n">__pyx_v_b</span><span class="p">;</span>
+
+    <span class="n">__pyx_v_b</span> <span class="o">=</span> <span class="n">__pyx_v_x</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="nl">__pyx_L8_break</span><span class="p">:;</span>
+
+  <span class="n">__pyx_r</span> <span class="o">=</span> <span class="n">__pyx_v_b</span><span class="p">;</span>
+  <span class="k">goto</span> <span class="n">__pyx_L0</span><span class="p">;</span>
+
+  <span class="nl">__pyx_L0</span><span class="p">:;</span>
+  <span class="n">__Pyx_RefNannyFinishContext</span><span class="p">();</span>
+  <span class="k">return</span> <span class="n">__pyx_r</span><span class="p">;</span>
+<span class="p">}</span>
+
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">14</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id6">
+
+<h2>Typage statique complet</h2>
+
+<p>Ce code n'est plus appelable depuis Python, seulement depuis C et Cython.</p>
+<p>Il faut créer un fichier de déclaration <code class="docutils literal"><span class="pre">mymath.pxd</span></code>:</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">cdef</span> <span class="kt">int</span> <span class="nf">pgcd</span><span class="p">(</span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">15</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id7">
+
+<h2>Typage statique complet</h2>
+
+<p>On peut <code class="docutils literal"><span class="pre">cimport</span></code>-er et utiliser la fonction depuis
+un fichier <code class="docutils literal"><span class="pre">fraction</span></code>:</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="nn">cython</span>
+<span class="k">from</span> <span class="nn">mymath</span> <span class="k">cimport</span> <span class="n">pgcd</span>
+
+<span class="nd">@cython</span><span class="o">.</span><span class="n">cdivision</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">simplify</span><span class="p">(</span><span class="nb">int</span> <span class="n">nume</span><span class="p">,</span> <span class="nb">int</span> <span class="n">denu</span><span class="p">):</span>
+    <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">p</span> <span class="o">=</span> <span class="n">pgcd</span><span class="p">(</span><span class="n">nume</span><span class="p">,</span> <span class="n">denu</span><span class="p">)</span>
+    <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">simple_nume</span> <span class="o">=</span> <span class="n">nume</span> <span class="o">/</span> <span class="n">p</span>
+    <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">simple_denu</span> <span class="o">=</span> <span class="n">denu</span> <span class="o">/</span> <span class="n">p</span>
+    <span class="k">return</span> <span class="n">simple_nume</span><span class="p">,</span> <span class="n">simple_denu</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">16</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id8">
+
+<h2>Typage statique complet</h2>
+
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">fraction</span>
+
+<span class="n">nume</span><span class="p">,</span> <span class="n">denu</span> <span class="o">=</span> <span class="mi">18</span><span class="p">,</span><span class="mi">42</span>
+<span class="n">simple_nume</span><span class="p">,</span> <span class="n">simple_denu</span> <span class="o">=</span> <span class="n">fraction</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span><span class="n">nume</span><span class="p">,</span><span class="n">denu</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">nume</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">simple_nume</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">denu</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">simple_denu</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text"><div class="highlight"><pre><span></span>18   3
+-- = -
+42   7
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">17</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id9">
+
+<h2>Typage statique complet</h2>
+
+<p>Gràce à <code class="docutils literal"><span class="pre">cimport</span></code>, on peut appeler une fonction C créer en Cython
+sans surcoût:</p>
+<blockquote>
+<div><ul class="simple">
+<li>pas de conversion d'arguments</li>
+<li>pas d'appel à une fonction Python</li>
+</ul>
+</div></blockquote>
+
+
+
+<div class="slide-no">18</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="htlm-colore">
+
+<h2>HTLM coloré</h2>
+
+<div class="highlight-bash"><div class="highlight"><pre><span></span>cython --annotate mymath.pyx
+</pre></div>
+</div>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/annotate_yellow.png"><img alt="../_images/annotate_yellow.png" src="../_images/annotate_yellow.png" style="height: 10cm;" /></a>
+</div>
+
+
+
+<div class="slide-no">19</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id10">
+
+<h2>HTLM coloré</h2>
+
+<div class="highlight-bash"><div class="highlight"><pre><span></span>cython --annotate mymath.pyx
+</pre></div>
+</div>
+<div class="figure">
+<img alt="../_images/annotate_yellow_expanded.png" src="../_images/annotate_yellow_expanded.png" />
+</div>
+
+
+
+<div class="slide-no">20</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id11">
+
+<h2>HTLM coloré</h2>
+
+<div class="highlight-bash"><div class="highlight"><pre><span></span>cython --annotate mymath.pyx
+</pre></div>
+</div>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/annotate_blank.png"><img alt="../_images/annotate_blank.png" src="../_images/annotate_blank.png" style="height: 10cm;" /></a>
+</div>
+
+
+
+<div class="slide-no">21</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="cpdef">
+
+<h2>cpdef</h2>
+
+<p>Une fonction peut être déclarée avec <code class="docutils literal"><span class="pre">cpdef</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="nb">int</span> <span class="n">pgcd</span><span class="p">(</span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="n">b</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>Cela crée deux fonctions:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Une fonction appelable depuis C/Cython</li>
+<li>Une fonction appelable depuis Python/Cython, et qui enrobe la première fonction.</li>
+</ul>
+</div></blockquote>
+
+
+
+<div class="slide-no">22</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="interfacage-fonction-c">
+
+<h2>Interfaçage fonction C</h2>
+
+<p>pgcd.h :</p>
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#ifndef PGCD_H</span>
+<span class="cp">#define PGCD_H</span>
+
+<span class="kt">int</span> <span class="nf">pgcd</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">);</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>pgcd.c</p>
+
+
+
+<div class="slide-no">23</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id12">
+
+<h2>Interfaçage fonction C</h2>
+
+<p>cmymath.pxd :</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">cdef</span> <span class="kr">extern</span> <span class="k">from</span> <span class="s">&quot;pgcd.h&quot;</span><span class="p">:</span>
+    <span class="nb">int</span> <span class="n">pgcd</span><span class="p">(</span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>mymath.pyx :</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">cimport</span> <span class="nn">cmymath</span>
+
+<span class="k">def</span> <span class="nf">pgcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cmymath</span><span class="o">.</span><span class="n">pgcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">24</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="bibliotheque-standard-c">
+
+<h2>Bibliothèque standard C</h2>
+
+<p>Cython fournit une interface à la bibliothèque C standard, par exemple:</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">from</span> <span class="nn">libc.math</span> <span class="k">cimport</span> <span class="n">sqrt</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">25</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="ctypedef">
+
+<h2>ctypedef</h2>
+
+<p>Un type <cite>C</cite> peut être déclaré avec <strong>ctypedef</strong> :</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">ctypedef</span> <span class="nb">unsigned</span> <span class="nb">long</span> <span class="nb">long</span> <span class="n">ullong</span><span class="p">;</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">26</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="cast">
+
+<h2>cast</h2>
+
+<p>Une variable peut-être castée avec la syntaxe <strong>&lt;...&gt;</strong> :</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">cdef</span> <span class="kt">int</span> <span class="nf">n</span> <span class="o">=</span> <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">sqrt</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">27</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="exercice">
+
+<h2>Exercice</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="c">#!/usr/bin/env python</span>
+<span class="k">import</span> <span class="nn">sys</span>
+<span class="k">import</span> <span class="nn">operator</span>
+<span class="k">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="nb">reduce</span>
+
+<span class="k">from</span> <span class="nn">find_divider</span> <span class="k">import</span> <span class="n">find_divider</span>
+
+<span class="k">def</span> <span class="nf">factorize_integer</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute and check dividers of an integer&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">number</span> <span class="o">&lt;</span> <span class="mf">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">number</span><span class="p">,]</span>
+
+    <span class="n">dividers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rest</span> <span class="o">=</span> <span class="n">number</span>
+
+    <span class="k">while</span> <span class="n">rest</span> <span class="o">!=</span> <span class="mf">1</span><span class="p">:</span>
+        <span class="n">divider</span> <span class="o">=</span> <span class="n">find_divider</span><span class="p">(</span><span class="n">rest</span><span class="p">)</span>
+        <span class="n">rest</span> <span class="o">/=</span> <span class="n">divider</span>
+        <span class="n">dividers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">divider</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">dividers</span><span class="p">)</span> <span class="o">==</span> <span class="n">number</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&quot;Product of </span><span class="si">%r</span><span class="s"> is not equal to </span><span class="si">%r</span><span class="s">&quot;</span> 
+            <span class="o">%</span> <span class="p">(</span><span class="n">dividers</span><span class="p">,</span><span class="n">number</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">dividers</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">!=</span> <span class="mf">2</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Usage: </span><span class="si">%s</span><span class="s"> NUMBER&#39;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">dividers</span> <span class="o">=</span> <span class="n">factorize_integer</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;dividers are&#39;</span><span class="p">,</span> <span class="n">dividers</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">28</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id13">
+
+<h2>Exercice</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sqrt</span>
+
+<span class="k">def</span> <span class="nf">find_divider</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the first divider (greatest than 1) of number&quot;&quot;&quot;</span>
+    <span class="n">number_sqrt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">number</span><span class="p">)</span><span class="o">+</span><span class="mf">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">divider</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="n">number_sqrt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">number</span> <span class="o">%</span> <span class="n">divider</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">divider</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">number</span><span class="p">;</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">29</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id14">
+
+<h2>Exercice</h2>
+
+<ul class="simple">
+<li>Optimiser la fonction <strong>find_divider(number)</strong> en typant statiquement les
+variables (<cite>unsigned long long</cite>).</li>
+<li>Utiliser les instructions de compilateur :<ul>
+<li>&#64;cython.cdivision(True)</li>
+<li>&#64;cython.boundscheck(False)</li>
+<li>&#64;cython.wraparound(False)</li>
+</ul>
+</li>
+<li>utiliser la fonction sqrt de libc.math</li>
+<li><a class="reference download internal" href="../_downloads/cython-0_factorize_number.tar.gz" download=""><code class="xref download docutils literal"><span class="pre">Télécharger</span> <span class="pre">l'exercice</span></code></a></li>
+<li><a class="reference download internal" href="../_downloads/cython-1_factorize_number.tar.gz" download=""><code class="xref download docutils literal"><span class="pre">Télécharger</span> <span class="pre">la</span> <span class="pre">solution</span></code></a></li>
+</ul>
+
+
+
+<div class="slide-no">30</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

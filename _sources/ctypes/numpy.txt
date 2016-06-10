@@ -1,0 +1,29 @@
+==============================================================================
+Utilisation de Numpy
+==============================================================================
+
+mymath.h
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/average/mymath.h
+   :language: c
+
+mymath.c
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/average/mymath.c
+   :language: c
+
+mymath.py
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/average/mymath.py
+   :language: python
+   :caption:
+
+demo.py
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/average/demo.py
+   :language: python
+   :caption:

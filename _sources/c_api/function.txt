@@ -1,0 +1,77 @@
+==============================================================================
+Fonctions d'extension de Python
+==============================================================================
+
+Fonction d'extension de Python
+----------------------------------------
+
+Une fonction qui étend les possiblités de Python
+
+.. code-block:: c
+
+    static PyObject *
+    foo(PyObject *self, PyObject *args, PyObject *kwargs)
+
+* ``self`` : si function: le module courant, si méthode: l'instance de objet.
+* ``args`` : les arguments. exemple : `foo(a,b)`
+* ``kwargs`` : les arguments par mots clefs. exemple :
+  ``foo(a,b,x=0,y=[1,2,3])``
+
+
+Extraction des arguments
+----------------------------------------
+
+La fonction ``PyArg_ParseTuple`` extrait les variables C de ``PyObject *args``.
+
+.. code-block:: c
+
+    static PyObject *
+    foo(PyObject *self, PyObject *args, PyObject *kwargs) {
+        int i,j;
+        const char *s;
+        ok = PyArg_ParseTuple(args, "iis", &i, &j, &s);
+        // utilise i, j et s.
+    }
+
+Pour récupérer un **PyObject *** (par exemple, une liste Python), on utilise
+la lettre **O**.
+
+.. rst-class:: scrollable-code
+
+Exemple de module d'extension
+----------------------------------------
+
+.. literalinclude:: example/square/mymath.c
+   :language: c
+
+Compiliation et utilisation
+----------------------------------------
+
+Compilation à la main :
+
+(à titre d'exemple, la bonne façon de faire est d'utiliser **distutils**)
+
+.. literalinclude:: example/square/build.sh
+   :language: bash
+
+Utilisation :
+
+.. code-block:: python
+
+    >>> import mymath
+    >>> mymath.square(10)
+
+distutils
+----------------------------------------
+
+Le module **distutils** gère ces étapes de compilation de façon portable :
+
+.. literalinclude:: example/square/setup.py
+   :language: python
+
+Exercice
+----------------------------------------
+
+Compiler et utiliser le module **mymath**.
+
+* :download:`Télécharger l'exercice <../_static/example/c_api-square.tar.gz>`

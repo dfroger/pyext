@@ -1,0 +1,74 @@
+==============================================================================
+Utilisation de Numpy
+==============================================================================
+
+Memoryviews
+------------------------------------------------------------------------------
+   
+Objets qui implémente le buffer protocol
+
+  - pep 3118
+  - protocol C que peuvent implémenter les objets python
+  - permet de partage le mémoire d'un tableau sans copie
+
+Memoryviews
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/memoryview/demo.pyx
+   :language: cython
+
+Memoryviews
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/memoryview/main.py
+   :language: cython
+
+fonction average (cmymath.h)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/average/cmymath.h
+   :language: cython
+
+fonction average (cmymath.pxd)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/average/cmymath.pxd
+   :language: cython
+
+fonction average (mymath.pyx)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/average/mymath.pyx
+   :language: cython
+
+example 0 (cmymath.c)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/almost_equal/cmymath.c
+   :language: c
+
+example 0 (cmymath.pxd)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/almost_equal/cmymath.pxd
+   :language: cython
+
+example 0 (mymath.pyx)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/almost_equal/mymath.pyx
+   :language: cython
+
+Exercice
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/myvector_exercice/cmyvector.hxx
+   :language: c++
+
+Exercice
+------------------------------------------------------------------------------
+
+Intefacer la classe **Vector**.
+
+* :download:`Télécharger l'exercice <../_static/example/cython-myvector_exercice.tar.gz>`
+* :download:`Télécharger la solution <../_static/example/cython-myvector_solution.tar.gz>`

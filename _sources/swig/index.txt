@@ -1,0 +1,12 @@
+****************************************
+SWIG
+****************************************
+
+.. toctree::
+  :maxdepth: 1
+
+  fonctionnement
+  typesystem
+  compilation
+  typemap
+  cxx

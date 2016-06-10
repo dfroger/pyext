@@ -1,0 +1,140 @@
+==============================================================================
+Fonctionnement de SWIG
+==============================================================================
+
+Fonctionnement de SWIG
+------------------------------------------------------------------------------
+
+* Scanner les fichiers, classes etc dans fichier d'entêtes.
+* Génère automatiquement un fichier d'interface.
+* Script SWIG.
+* Largement utilisé, stable.
+* Le code C généré est portable (GNU/Linux, Windows, OSX, Python 2, Python 3).
+
+Exemple de ``mymath``
+------------------------------------------------------------------------------
+
+Un fichier d'entête et un fichier d'implémentation:
+
+.. literalinclude:: example/square/mymath.h
+   :language: c
+
+.. literalinclude:: example/square/mymath.c
+   :language: c
+
+Script SWIG
+------------------------------------------------------------------------------
+
+.. code-block:: swig
+
+    %module mymath
+    %header %{
+    #include "mymath.h"
+    %}
+    %include "mymath.h"
+
+* Directives SWIG : symbole pourcentage ``%``, Bloc : ``%{ ... %}``
+* ``%header``: code inséré dans le fichier C généré
+* ``%include`` :
+
+  * SWIG scanne le fichier passé en paramètre
+  * génère une interface pour les fonctions et classes 
+
+* Commentaires: ``/* ... */``.
+
+Fichiers générés
+------------------------------------------------------------------------------
+
+SWIG génère deux fichiers, de haut et de bas niveau:
+
+* un fichier ``mymath_wrap.c`` assez long, qui est compilé dans la bibliothèque
+   ``_mymath.so``
+
+* un fichier ``mymath.py``. Cela permet de personnaliser le module en insérant
+   du code en pur Python.
+
+Structure du fichier mymath_wrap.c
+------------------------------------------------------------------------------
+
++ **Begin section** Un endroit où les utilisateurs peuvent mettre du code au
+  début du fichier d'interface (macro préprocesseur par exemple).
+
++ **Code runtime** Code interne à SWIG, fonction de support.
+
++ **Section d'entête** Code définit par l'utilisateur entre %header %{ ... %}
+  (ou %{ ... %} en abrégé). Utilisé pour les fichiers d'entête et fonctions
+  de support.
+
++ **Code d'interface** Fonctions d'interface générés automatiquement par SWIG.
+
++ **Initialisation du module** Fonction d'initialisation du module généré par SWIG.
+
+Fichier mymath_wrap.c
+------------------------------------------------------------------------------
+
+Dans le fichier ``mymath_wrap.c```, les lignes 1 à 3065 sont du code de la
+bibliothèque SWIG copiés tel quel, consistant en des fonctions supports pour
+rendre le code robuste et portable.
+
+La fonction d'interface de la fonction ``square`` se situent entre les lignes
+3073 à 3092 :
+
+.. code-block:: c
+   
+    SWIGINTERN PyObject *
+    _wrap_square(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+    ...
+    }
+
+Conversion des arguments de Python vers C
+------------------------------------------------------------------------------
+
+.. literalinclude:: src/python-to-c.c
+   :language: c
+
+Appel à la fonction C
+------------------------------------------------------------------------------
+
+.. code-block:: c
+
+      result = (double)square(arg1);
+
+Conversion des arguments de C vers Python
+------------------------------------------------------------------------------
+
+.. code-block:: c
+
+      resultobj = SWIG_From_double((double)(result));
+      return resultobj;
+
+Table des méthodes (ligne 3095)
+------------------------------------------------------------------------------
+
+.. code-block:: c
+
+    static PyMethodDef SwigMethods[] = {
+       { (char *)"SWIG_PyInstanceMethod_New",
+         (PyCFunction)SWIG_PyInstanceMethod_New,
+         METH_O, NULL
+         },
+       { (char *)"square", _wrap_square, METH_VARARGS, NULL},
+       { NULL, NULL, 0, NULL }
+    };
+
+Initialisation du module
+------------------------------------------------------------------------------
+
+.. code-block:: c
+
+    #if PY_VERSION_HEX >= 0x03000000
+      m = PyModule_Create(&SWIG_module);
+    #else
+      m = Py_InitModule((char *) SWIG_name, SwigMethods);
+    #endif
+
+Exercice
+----------------------------------------
+
+Compiler et utiliser le module **mymath** avec SWIG.
+
+* :download:`Télécharger l'exercice <../_static/example/swig-square.tar.gz>`

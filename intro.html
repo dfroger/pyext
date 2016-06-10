@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <script type="text/javascript" src="_static/common.js"></script>
+    
+    <script type="text/javascript" src="_static/slides.js"></script>
+    <script type="text/javascript" src="_static/sync.js"></script>
+    <script type="text/javascript" src="_static/controller.js"></script>
+    <script type="text/javascript" src="_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="index.html" />
+    <link rel="next" title="API C/Python" href="c_api/index.html" />
+    <link rel="prev" title="Interfaçage de code C/C++ avec Python" href="index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="introduction">
+
+<h1>Introduction</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="etendre-python">
+
+<h2>Étendre Python</h2>
+
+<p><a class="reference external" href="http://www.python.org">Python</a> a été conçu pour être facilement <a class="reference external" href="http://docs.python.org/3.5/extending/index.html">étendu</a> avec des
+fonctions écrites en C, C++ et Fortran.</p>
+<p>Il est donc également possible :</p>
+<blockquote>
+<div><ul class="simple">
+<li>D'appeler des <strong>fonctions C déjà existante</strong>.</li>
+<li>Moyennant l'écriture de <strong>code d'interface</strong>.</li>
+</ul>
+</div></blockquote>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="api-c-python">
+
+<h2>API C/Python</h2>
+
+<p>Nous commencerons par écrire à la main une interface Python à un fonction C.</p>
+<ul class="simple">
+<li>Examiner les grands principes de l'API C/Python.</li>
+<li>Sujet technique.</li>
+<li>Mais utile pour comprendre les outils par la suite.</li>
+</ul>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="swig">
+
+<h2>SWIG</h2>
+
+<ul class="simple">
+<li>Scanne les fichiers d'entêtes.</li>
+<li>Génère automatiquement une interface à une bibliothèque C/C++.</li>
+<li>Nombreux langages cible: Androïd, Lua, Perl, PHP, Python, R, Tcl ...</li>
+<li>Scripts SWIG basés sur des macros.</li>
+</ul>
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="cython">
+
+<h2>Cython</h2>
+
+<ul class="simple">
+<li>Un langage et un compilateur (vers <cite>C</cite>).</li>
+<li>Langage créole : entre le C et le Python.</li>
+<li>Peut être typé statiquement ou dynamiquement.</li>
+<li>Adapté pour créer des API Pythonic.</li>
+</ul>
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="ctypes">
+
+<h2>ctypes</h2>
+
+<p>En pure Python, appelle directement une bibliothèque compilée.</p>
+
+
+
+<div class="slide-no">6</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="notes">
+
+<h2>Notes</h2>
+
+<ul class="simple">
+<li>Pas exhaustif (demenderait beaucoup de temps).</li>
+<li>Faciliter la prise en main des outils.</li>
+<li>Pas abordés:<ul>
+<li><cite>SIP</cite></li>
+<li><cite>Boost.Python</cite>.</li>
+</ul>
+</li>
+</ul>
+
+
+
+<div class="slide-no">7</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="dependences">
+
+<h2>Dépendences</h2>
+
+<p>Pour executer les exemples, installer les dépendences suivantes:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda create -n pyext <span class="nv">python</span><span class="o">=</span>3.5 swig cython ipython
+<span class="nb">source</span> activate pyext
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">8</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

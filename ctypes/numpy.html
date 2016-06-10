@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Utilisation de Numpy &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="../index.html" />
+    <link rel="up" title="ctypes" href="index.html" />
+    <link rel="next" title="Structures" href="structure.html" />
+    <link rel="prev" title="Fonctionnement" href="fonctionnement.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="utilisation-de-numpy">
+
+<h1>Utilisation de Numpy</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="mymath-h">
+
+<h2>mymath.h</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#ifndef AVERAGE_H</span>
+<span class="cp">#define AVERAGE_H</span>
+
+<span class="kt">double</span> <span class="nf">average</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">numbers_list</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">size</span><span class="p">);</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="mymath-c">
+
+<h2>mymath.c</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="kt">double</span> <span class="nf">average</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">numbers_list</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">size</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">double</span> <span class="n">average</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="n">average</span> <span class="o">+=</span> <span class="n">numbers_list</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="k">return</span> <span class="n">average</span> <span class="o">/</span> <span class="n">size</span><span class="p">;</span>
+<span class="p">}</span>
+
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="mymath-py">
+
+<h2>mymath.py</h2>
+
+<div class="literal-block-wrapper container" id="example-average-mymath-py">
+<div class="code-block-caption"><span class="caption-text">example/average/mymath.py</span></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ctypes</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="n">c_mymath</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="s2">&quot;./libmymath.so&quot;</span><span class="p">)</span>
+<span class="n">c_average</span> <span class="o">=</span> <span class="n">c_mymath</span><span class="o">.</span><span class="n">average</span>
+
+<span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">numbers_list</span><span class="p">):</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">numbers_list</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">arr_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ctypeslib</span><span class="o">.</span><span class="n">ndpointer</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">c_average</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr_type</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint</span><span class="p">,</span> <span class="p">]</span>
+    <span class="n">c_average</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span>
+
+    <span class="k">return</span> <span class="n">c_average</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="demo-py">
+
+<h2>demo.py</h2>
+
+<div class="literal-block-wrapper container" id="example-average-demo-py">
+<div class="code-block-caption"><span class="caption-text">example/average/demo.py</span></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mymath</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="mi">300</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="k">print</span><span class="p">(</span> <span class="n">mymath</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="p">)</span>
+<span class="k">print</span><span class="p">(</span> <span class="n">mymath</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

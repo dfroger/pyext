@@ -1,0 +1,28 @@
+==============================================================================
+Conclusion
+==============================================================================
+
+Conclusion
+----------------------------------------
+
+Un module Python compilé pour définir de nouvelles fonctions contient:
+
+- Une fonction d'initialisation.
+
+- Une table de méthodes du module.
+
+- Des fonctions d'extensions.
+
+
+SWIG
+----------------------------------------
+
+Écrire du code robuste est difficile et prend du temps:
+
+    * Accepter différents types (tuple, list, tableau Numpy)
+
+    * Convertir les types (``int`` en ``double`` par exemple)
+
+    * Gérer les erreurs parfaitement
+
+SWIG permet d'automatiser cela.

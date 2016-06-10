@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Le langage Cython &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="../index.html" />
+    <link rel="up" title="Cython" href="index.html" />
+    <link rel="next" title="Interfaçage de C++" href="cxx.html" />
+    <link rel="prev" title="Entre C et Python" href="between.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="le-langage-cython">
+
+<h1>Le langage Cython</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="programmation-objet-mypair-pyx">
+
+<h2>Programmation objet (mypair.pyx)</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">cdef</span> <span class="k">class</span> <span class="nf">MyPair</span><span class="p">:</span>
+    <span class="k">cdef</span> <span class="kr">public</span><span class="p">:</span>
+        <span class="nb">int</span> <span class="n">first</span>
+        <span class="nb">int</span> <span class="n">second</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span> <span class="n">first</span><span class="p">,</span> <span class="nb">int</span> <span class="n">second</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="n">first</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">second</span> <span class="o">=</span> <span class="n">second</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;(</span><span class="si">%r</span><span class="s">,</span><span class="si">%r</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">second</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="programmation-objet-setup-py">
+
+<h2>Programmation objet (setup.py)</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">from</span> <span class="nn">distutils.core</span> <span class="k">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
+<span class="k">from</span> <span class="nn">Cython.Build</span> <span class="k">import</span> <span class="n">cythonize</span>
+
+<span class="n">ext</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span><span class="s">&#39;mypair&#39;</span><span class="p">,</span> <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;mypair.pyx&#39;</span><span class="p">,])</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">ext_modules</span><span class="o">=</span><span class="n">cythonize</span><span class="p">(</span><span class="n">ext</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>python setup.py build_ext --inplace
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="programmation-objet-main-py">
+
+<h2>Programmation objet (main.py)</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="nn">mypair</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">mypair</span><span class="o">.</span><span class="n">MyPair</span><span class="p">(</span><span class="mf">4</span><span class="p">,</span> <span class="mf">5</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">second</span> <span class="o">=</span> <span class="mf">7</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="programmation-objet">
+
+<h2>Programmation objet</h2>
+
+<ul class="simple">
+<li>héritage de classes</li>
+<li>property</li>
+<li>attributs privés (defaut), readonly, public</li>
+<li>__cinit__, __dealloc__</li>
+</ul>
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="programmation-generique-fused-types">
+
+<h2>Programmation générique (fused types)</h2>
+
+<p>mymath.pxd:</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">from</span> <span class="nn">cython</span> <span class="k">cimport</span> <span class="n">integral</span>
+
+<span class="k">cpdef</span> <span class="kt">integral</span> <span class="nf">pgcd</span><span class="p">(</span><span class="n">integral</span> <span class="n">a</span><span class="p">,</span> <span class="n">integral</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">6</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="programmation-generique">
+
+<h2>Programmation générique</h2>
+
+<p>mymath.pyx:</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">from</span> <span class="nn">cython</span> <span class="k">cimport</span> <span class="n">integral</span>
+<span class="k">import</span> <span class="nn">cython</span>
+
+<span class="nd">@cython</span><span class="o">.</span><span class="n">cdivision</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">cpdef</span> <span class="kt">integral</span> <span class="nf">pgcd</span><span class="p">(</span><span class="n">integral</span> <span class="n">a</span><span class="p">,</span> <span class="n">integral</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span><span class="o">==</span><span class="mf">0</span> <span class="ow">or</span> <span class="n">b</span><span class="o">==</span><span class="mf">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">&gt;</span> <span class="n">a</span><span class="p">:</span>
+        <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span><span class="n">a</span>
+    <span class="k">cdef</span> <span class="kt">integral</span> <span class="nf">x</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">a</span> <span class="o">%</span> <span class="n">b</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">b</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">7</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="id1">
+
+<h2>Programmation générique</h2>
+
+<p>fraction.pyx:</p>
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="nn">cython</span>
+<span class="k">from</span> <span class="nn">mymath</span> <span class="k">cimport</span> <span class="n">pgcd</span>
+
+<span class="nd">@cython</span><span class="o">.</span><span class="n">cdivision</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">simplify</span><span class="p">(</span><span class="nb">int</span> <span class="n">nume</span><span class="p">,</span> <span class="nb">int</span> <span class="n">denu</span><span class="p">):</span>
+    <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">p</span> <span class="o">=</span> <span class="n">pgcd</span><span class="p">(</span><span class="n">nume</span><span class="p">,</span> <span class="n">denu</span><span class="p">)</span>
+    <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">simple_nume</span> <span class="o">=</span> <span class="n">nume</span> <span class="o">/</span> <span class="n">p</span>
+    <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">simple_denu</span> <span class="o">=</span> <span class="n">denu</span> <span class="o">/</span> <span class="n">p</span>
+    <span class="k">return</span> <span class="n">simple_nume</span><span class="p">,</span> <span class="n">simple_denu</span>
+
+<span class="nd">@cython</span><span class="o">.</span><span class="n">cdivision</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">another_simplify</span><span class="p">(</span><span class="nb">long</span> <span class="n">nume</span><span class="p">,</span> <span class="nb">long</span> <span class="n">denu</span><span class="p">):</span>
+    <span class="k">cdef</span> <span class="kt">long</span> <span class="nf">p</span> <span class="o">=</span> <span class="n">pgcd</span><span class="p">(</span><span class="n">nume</span><span class="p">,</span> <span class="n">denu</span><span class="p">)</span>
+    <span class="k">cdef</span> <span class="kt">long</span> <span class="nf">simple_nume</span> <span class="o">=</span> <span class="n">nume</span> <span class="o">/</span> <span class="n">p</span>
+    <span class="k">cdef</span> <span class="kt">long</span> <span class="nf">simple_denu</span> <span class="o">=</span> <span class="n">denu</span> <span class="o">/</span> <span class="n">p</span>
+    <span class="k">return</span> <span class="n">simple_nume</span><span class="p">,</span> <span class="n">simple_denu</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">8</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Programmation générique (fused types)</h2>
+
+<p>Types disponibles:</p>
+<ul class="simple">
+<li>integral : short, int, long</li>
+<li>floating : float, double</li>
+<li>numeric : integral, floating, float complex, double complex</li>
+</ul>
+<p>Attention : membres de classe non-supportés.</p>
+
+
+
+<div class="slide-no">9</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="autres">
+
+<h2>Autres</h2>
+
+<ul class="simple">
+<li>Possibilité de dévérouiller le <cite>GIL</cite> (Global Interpreter Lock).</li>
+<li>Parallelisme en mémoire paratagée : <cite>prange</cite>, utilise <cite>OpenMP</cite>.</li>
+<li>Déboggeur.</li>
+</ul>
+
+
+
+<div class="slide-no">10</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

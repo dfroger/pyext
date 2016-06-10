@@ -1,0 +1,188 @@
+========================================
+Système de type à l'exécution
+========================================
+
+Exemple
+----------------------------------------
+
+Supposons que l'on implémente un solveur de système linéaire.
+
+Supposons que l'on se base sur une bibliothèque externe de vecteurs et de matrices:
+
+   * Implémente une classe ``SomeMatrix``.
+   * Stocke un tableau 2D en mémoire contigüe.
+   * Définie quelques méthodes.
+
+.. rst-class:: scrollable-code
+
+somematrix.hxx
+----------------------------------------
+
+.. literalinclude:: example/runtime/somematrix/somematrix.hxx
+   :language: c
+
+.. rst-class:: scrollable-code
+
+somematrix.cxx
+----------------------------------------
+
+.. literalinclude:: example/runtime/somematrix/somematrix.cxx
+   :language: c
+
+.. rst-class:: scrollable-code
+
+solver.hxx
+----------------------------------------
+
+.. literalinclude:: example/runtime/solver.hxx
+   :language: c
+
+.. rst-class:: scrollable-code
+
+solver.cxx
+----------------------------------------
+
+.. literalinclude:: example/runtime/solver.cxx
+   :language: c
+
+util.hxx
+----------------------------------------
+
+.. literalinclude:: example/runtime/util.hxx
+   :language: c
+
+.. rst-class:: scrollable-code
+
+util.cxx
+----------------------------------------
+
+.. literalinclude:: example/runtime/util.cxx
+   :language: c
+
+main
+----------------------------------------
+
+.. literalinclude:: example/runtime/main.cxx
+   :language: c
+
+solver.i
+----------------------------------------
+
+.. literalinclude:: example/runtime/solver.i
+   :language: c
+
+setup.py
+----------------------------------------
+
+.. literalinclude:: example/runtime/setup.py
+   :language: python
+
+setup.py
+----------------------------------------
+
+Après avoir construit le module Python:
+
+.. code-block:: bash
+
+    python setup.py build_ext --inplace
+
+Nous pouvons l'importer et utiliser les fonctions de ``Solver`` et de support:
+
+.. literalinclude:: example/runtime/demo.py
+   :language: python
+
+Sytème de type à l'exécution
+----------------------------------------
+
+* SWIG ne génère pas d'interface pour la classe ``SomeMatrix``. En fait, SWIG
+  n'a aucune information sur le contenu des fichiers
+  ``somematrix/somematrix.cxx`` et ``somematrix/somematrix.hxx``.
+
+* SWIG est capable de passer en argument de fonction une variable de type
+  ``SomeMatrix``, bien que SWIG ne sache pas ce que ``SomeMatrix`` est.
+
+
+Matrice A
+----------------------------------------
+
+L'affichage de la matrice A produit:
+
+.. code-block:: bash
+
+   <Swig Object of type 'SomeMatrix *' at 0x7fcd7a9de2a0>
+
+
+Système de type
+----------------------------------------
+
+Tout ce qui n'est pas:
+
+   * un type de base,
+   * un ``struct``
+   * une ``class``
+   * un tableau
+
+Va être manipulé par SWIG comme un pointeur, avec une vérification du type
+à l'exécution.
+
+SWIG a résolu le ``typedef`` (argument ``IndexType`` de
+``set_element_to_zero``).
+
+Système de type
+----------------------------------------
+
+Par exemple:
+
+.. code-block:: python
+
+    slv.set_matrix_value( [[1,2],[3,4]] )
+
+produit une exception:
+
+.. code-block:: python
+
+    Traceback (most recent call last):
+      File "main.py", line 5, in <module>
+        slv.set_matrix_value( [[1,2],[3,4]] )
+    TypeError: in method 'set_matrix_value', argument 1 of type 'SomeMatrix *'
+
+SWIG ne sait pas ce qu'est une ``SomeMatrix``, mais il est capable de savoir
+que quelque chose n'est pas une ``SomeMatrix``.
+
+Système de type
+----------------------------------------
+
+Bien sûr, il n'est pas possible d'appeler les méthodes de ``SomeMatrix``:
+
+.. code-block:: python
+
+    A.display()
+
+    Traceback (most recent call last):
+      File "main2.py", line 9, in <module>
+        A.display()
+    AttributeError: 'SwigPyObject' object has no attribute 'display'
+
+``A`` est un objet SWIG qui enrobe un pointeur avec des informations sur le type,
+mais pas une vrai interface à ``SomeMatrix``.
+
+Exercice
+----------------------------------------
+
+Créer une interface Python pour la fonction ``pgcd`` :
+
+.. literalinclude:: example/pgcd/pgcd.h
+   :language: c
+   :caption:
+
+Exercice
+----------------------------------------
+
+.. literalinclude:: example/pgcd/pgcd.c
+   :language: c
+   :caption:
+
+Exercice
+----------------------------------------
+
+* :download:`Télécharger la solution <../_static/example/swig-pgcd.tar.gz>`

@@ -1,0 +1,49 @@
+==============================================================================
+Fonctionnement
+==============================================================================
+
+Introduction
+------------------------------------------------------------------------------
+
+* Un module Python de la bibliothèque standand.
+* Utilise directement la bibliothèque compilée.
+* Tout est écrit en Python
+* Pas d'interface en C écrite en C, pas de compilation.
+* N'a aucune information des fichiers d'entêtes.
+
+Avec C++
+------------------------------------------------------------------------------
+
+* Pas d'interface binaire standard à `C++`.
+* Pas recommandé d'utiliser `ctypes`.
+* Ou, fournir une interface `C` à son code `C++`.
+
+Bibliothèque `mymath`
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/square/mymath.h
+   :language: c
+   :caption:
+
+.. literalinclude:: example/square/mymath.c
+   :language: c
+   :caption:
+
+Module Python
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/square/mymath.py
+   :language: python
+   :caption:
+
+.. literalinclude:: example/square/demo.py
+   :language: python
+   :caption:
+
+Exercice
+------------------------------------------------------------------------------
+
+Interface la fonction **pgcd** avec `ctypes`.
+
+* :download:`Télécharger l'exercice <../_static/example/ctypes-pgcd_exercice.tar.gz>`
+* :download:`Télécharger la solution <../_static/example/ctypes-pgcd_solution.tar.gz>`

@@ -1,0 +1,22 @@
+========================================
+Strategie de compilation
+========================================
+
+stratégie de compilation
+----------------------------------------
+
+Lorsque l'on construit une interface pour une bibliothèque, il n'est pas
+nécessaire d'interfacer ses dépendances privées. 
+
+On peut compiler dans des bibliothèques dynamiques séparées, ou dans une
+seule:
+
+* les dépendances privées
+* la bibliothèque
+* le code d'interfaçage
+
+On peut distribuer ces bibliothèques séparément.
+
+Il est également possible de générer avec SWIG plusieurs modules Python pour
+une même bibliothèque, selon la taille de celle-ci.
+

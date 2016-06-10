@@ -1,0 +1,16 @@
+========================================
+Introduction
+========================================
+
+Introduction
+----------------------------------------
+
+- Appel d'une fonction C depuis Python (`extending`).
+- Gràce à l'API C/Python.
+
+  - Conversion des arguments de Python vers C.
+  - Appel de la fonction C.
+  - Conversion du résultat de C version Python.
+- Les types d'extension ne seront pas abordés
+- Appeler Python depuis C (`embedding`) pas abordés.
+

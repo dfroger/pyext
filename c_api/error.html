@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Gestion des erreurs &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="../index.html" />
+    <link rel="up" title="API C/Python" href="index.html" />
+    <link rel="next" title="Utilisation de Numpy" href="numpy.html" />
+    <link rel="prev" title="Fonctions d&#39;extension de Python" href="function.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="gestion-des-erreurs">
+
+<h1>Gestion des erreurs</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>Gestion des erreurs</h2>
+
+<ul class="simple">
+<li>Une fonction indique une erreur en renvoyant (habituellement) <code class="docutils literal"><span class="pre">NULL</span></code>.</li>
+<li>L'interpréteur va alors vérifier la présence d'exception.</li>
+</ul>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="exemple">
+
+<h2>Exemple</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">mymath_sqrt</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">double</span> <span class="n">number</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">number_sqrt</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="s">&quot;d&quot;</span><span class="p">,</span><span class="o">&amp;</span><span class="n">number</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">number</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">PyErr_SetString</span><span class="p">(</span><span class="n">PyExc_ValueError</span><span class="p">,</span><span class="s">&quot;number must be positive&quot;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">number_sqrt</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">number</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">PyFloat_FromDouble</span><span class="p">(</span><span class="n">number_sqrt</span><span class="p">);</span>
+<span class="p">}</span>
+
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="exercice-1">
+
+<h2>Exercice 1</h2>
+
+<p>Rajouter la fonction <code class="docutils literal"><span class="pre">sqrt</span></code> au module Python <code class="docutils literal"><span class="pre">mymath</span></code>.</p>
+<ul class="simple">
+<li><a class="reference download internal" href="../_downloads/c_api-square.tar.gz" download=""><code class="xref download docutils literal"><span class="pre">Télécharger</span> <span class="pre">l'exercice</span></code></a></li>
+<li><a class="reference download internal" href="../_downloads/c_api-sqrt.tar.gz" download=""><code class="xref download docutils literal"><span class="pre">Télécharger</span> <span class="pre">la</span> <span class="pre">solution</span></code></a></li>
+</ul>
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="exercice-2">
+
+<h2>Exercice 2</h2>
+
+<ul class="simple">
+<li>Ajouter à <code class="docutils literal"><span class="pre">mymath.c</span></code> une fonction C <code class="docutils literal"><span class="pre">average</span></code>.</li>
+<li>Ajouter à <code class="docutils literal"><span class="pre">mymath.c</span></code> une fonction Python <code class="docutils literal"><span class="pre">mymath_average</span></code>. Cette
+fonction doit :<ul>
+<li>Vérifier que les éléments sont des nombres.</li>
+<li>Copier les éléments dans un tableau C.</li>
+</ul>
+</li>
+</ul>
+<p><a class="reference download internal" href="../_downloads/c_api-average.tar.gz" download=""><code class="xref download docutils literal"><span class="pre">Télécharger</span> <span class="pre">la</span> <span class="pre">solution</span></code></a></p>
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Exercice 2</h2>
+
+<dl class="function">
+<dt id="c.PyList_Check">
+int <code class="descname">PyList_Check</code><span class="sig-paren">(</span><a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a><em>&nbsp;*p</em><span class="sig-paren">)</span></dt>
+<dd><p>Renvoie vrai si <em>p</em> est une objet liste, ou une instance d'un sous-type.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.PyList_GetItem">
+<a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a>* <code class="descname">PyList_GetItem</code><span class="sig-paren">(</span><a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a><em>&nbsp;*list</em>, Py_ssize_t<em>&nbsp;index</em><span class="sig-paren">)</span></dt>
+<dd><p>Return the object at position <em>index</em> in the list pointed to by <em>list</em>.  The
+position must be positive, indexing from the end of the list is not
+supported.  If <em>index</em> is out of bounds, return <em>NULL</em> and set an
+<code class="xref py py-exc docutils literal"><span class="pre">IndexError</span></code> exception.</p>
+</dd></dl>
+
+
+
+
+<div class="slide-no">6</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>Exercice 2</h2>
+
+<dl class="function">
+<dt id="c.PyFloat_AsDouble">
+double <code class="descname">PyFloat_AsDouble</code><span class="sig-paren">(</span><a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a><em>&nbsp;*pyfloat</em><span class="sig-paren">)</span></dt>
+<dd><p>Return a C <code class="xref c c-type docutils literal"><span class="pre">double</span></code> representation of the contents of <em>pyfloat</em>.  If
+<em>pyfloat</em> is not a Python floating point object but has a <code class="xref py py-meth docutils literal"><span class="pre">__float__()</span></code>
+method, this method will first be called to convert <em>pyfloat</em> into a float.
+This method returns <code class="docutils literal"><span class="pre">-1.0</span></code> upon failure, so one should call
+<a class="reference internal" href="#c.PyErr_Occurred" title="PyErr_Occurred"><code class="xref c c-func docutils literal"><span class="pre">PyErr_Occurred()</span></code></a> to check for errors.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.PyFloat_FromDouble">
+<a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a>* <code class="descname">PyFloat_FromDouble</code><span class="sig-paren">(</span>double<em>&nbsp;v</em><span class="sig-paren">)</span></dt>
+<dd><p>Create a <a class="reference external" href="https://docs.python.org/c-api/float.html#c.PyFloatObject" title="(disponible dans Python v2.7)"><code class="xref c c-type docutils literal"><span class="pre">PyFloatObject</span></code></a> object from <em>v</em>, or <em>NULL</em> on failure.</p>
+</dd></dl>
+
+
+
+
+<div class="slide-no">7</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id4">
+
+<h2>Exercice 2</h2>
+
+<dl class="function">
+<dt id="c.PyList_Size">
+Py_ssize_t <code class="descname">PyList_Size</code><span class="sig-paren">(</span><a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a><em>&nbsp;*list</em><span class="sig-paren">)</span></dt>
+<dd><p id="index-0">Return the length of the list object in <em>list</em>; this is equivalent to
+<code class="docutils literal"><span class="pre">len(list)</span></code> on a list object.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.PyErr_Occurred">
+<a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a>* <code class="descname">PyErr_Occurred</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Test whether the error indicator is set.  If set, return the exception <em>type</em>
+(the first argument to the last call to one of the <code class="xref c c-func docutils literal"><span class="pre">PyErr_Set*()</span></code>
+functions or to <a class="reference external" href="https://docs.python.org/c-api/exceptions.html#c.PyErr_Restore" title="(disponible dans Python v2.7)"><code class="xref c c-func docutils literal"><span class="pre">PyErr_Restore()</span></code></a>).  If not set, return <em>NULL</em>.  You do not
+own a reference to the return value, so you do not need to <a class="reference external" href="https://docs.python.org/c-api/refcounting.html#c.Py_DECREF" title="(disponible dans Python v2.7)"><code class="xref c c-func docutils literal"><span class="pre">Py_DECREF()</span></code></a>
+it.</p>
+</dd></dl>
+
+
+
+
+<div class="slide-no">8</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

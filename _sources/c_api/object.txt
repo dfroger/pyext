@@ -1,0 +1,57 @@
+========================================
+Tout est objet
+========================================
+
+Tout est objet
+----------------------------------------
+
+En Python, tout est objet :
+
+    * entiers
+    * chaînes de caractères
+    * fonctions
+    * classes
+    * instances
+    * ... 
+
+CPython: 
+  - Implémentation de référence en C du langage.
+  - Les objets sont des structures C.
+
+Implémentation
+----------------------------------------
+
+Dans le code source de Python, le fichier ``Include/object.h`` contient la
+définition de ``PyObject`` :
+
+.. code-block:: c
+
+    typedef struct _object {
+        _PyObject_HEAD_EXTRA
+        Py_ssize_t ob_refcnt;
+        struct _typeobject *ob_type;
+    } PyObject;
+
+
+PyObject
+----------------------------------------
+
+Chaque objet contient au minimum:
+
+* Un compteur de référence, pour la gestion de la mémoire
+* Son type
+
+Conversion entre Python et C
+----------------------------------------
+
+Exemple de fonctions de l'API C/Python:
+
+.. c:function:: int PyList_Check(PyObject *p)
+
+   Renvoie vrai si *p* est une objet liste, ou une instance d'un sous-type.
+
+.. c:function:: PyObject* PyLong_FromLong(long v)
+
+   Retourne un nouveau :c:type:`PyLongObject` à partir de *v*, ou *NULL*
+   en cas d'erreur.
+

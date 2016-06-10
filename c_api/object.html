@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tout est objet &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="../index.html" />
+    <link rel="up" title="API C/Python" href="index.html" />
+    <link rel="next" title="Modules Python" href="module.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="tout-est-objet">
+
+<h1>Tout est objet</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>Tout est objet</h2>
+
+<p>En Python, tout est objet :</p>
+<blockquote>
+<div><ul class="simple">
+<li>entiers</li>
+<li>chaînes de caractères</li>
+<li>fonctions</li>
+<li>classes</li>
+<li>instances</li>
+<li>...</li>
+</ul>
+</div></blockquote>
+<dl class="docutils">
+<dt>CPython:</dt>
+<dd><ul class="first last simple">
+<li>Implémentation de référence en C du langage.</li>
+<li>Les objets sont des structures C.</li>
+</ul>
+</dd>
+</dl>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="implementation">
+
+<h2>Implémentation</h2>
+
+<p>Dans le code source de Python, le fichier <code class="docutils literal"><span class="pre">Include/object.h</span></code> contient la
+définition de <code class="docutils literal"><span class="pre">PyObject</span></code> :</p>
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_object</span> <span class="p">{</span>
+    <span class="n">_PyObject_HEAD_EXTRA</span>
+    <span class="n">Py_ssize_t</span> <span class="n">ob_refcnt</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">_typeobject</span> <span class="o">*</span><span class="n">ob_type</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">PyObject</span><span class="p">;</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="pyobject">
+
+<h2>PyObject</h2>
+
+<p>Chaque objet contient au minimum:</p>
+<ul class="simple">
+<li>Un compteur de référence, pour la gestion de la mémoire</li>
+<li>Son type</li>
+</ul>
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="conversion-entre-python-et-c">
+
+<h2>Conversion entre Python et C</h2>
+
+<p>Exemple de fonctions de l'API C/Python:</p>
+<dl class="function">
+<dt id="c.PyList_Check">
+int <code class="descname">PyList_Check</code><span class="sig-paren">(</span><a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a><em>&nbsp;*p</em><span class="sig-paren">)</span></dt>
+<dd><p>Renvoie vrai si <em>p</em> est une objet liste, ou une instance d'un sous-type.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.PyLong_FromLong">
+<a class="reference external" href="https://docs.python.org/c-api/structures.html#c.PyObject" title="(disponible dans Python v2.7)">PyObject</a>* <code class="descname">PyLong_FromLong</code><span class="sig-paren">(</span>long<em>&nbsp;v</em><span class="sig-paren">)</span></dt>
+<dd><p>Retourne un nouveau <a class="reference external" href="https://docs.python.org/c-api/long.html#c.PyLongObject" title="(disponible dans Python v2.7)"><code class="xref c c-type docutils literal"><span class="pre">PyLongObject</span></code></a> à partir de <em>v</em>, ou <em>NULL</em>
+en cas d'erreur.</p>
+</dd></dl>
+
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

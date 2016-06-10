@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Utilisation de Numpy &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="../index.html" />
+    <link rel="up" title="API C/Python" href="index.html" />
+    <link rel="next" title="Conclusion" href="conclusion.html" />
+    <link rel="prev" title="Gestion des erreurs" href="error.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="utilisation-de-numpy">
+
+<h1>Utilisation de Numpy</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>Utilisation de Numpy</h2>
+
+<ul class="simple">
+<li>Listes Python : structures polyvalentes.<ul>
+<li>Données hétérogènes.</li>
+<li>Dynamiques: <cite>append</cite>, <cite>delete</cite>, <cite>insert</cite>.</li>
+</ul>
+</li>
+<li>Tableaux Numpy : adaptés aux grands tableaux de nombre.<ul>
+<li>Données homogènes.</li>
+<li>Mémoire contigüe.</li>
+</ul>
+</li>
+</ul>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="exercice-3">
+
+<h2>Exercice 3</h2>
+
+<p>Réécrire la fonction <strong>mymath_average</strong> pour qu'elle prenne en argument un
+tableau Numpy.</p>
+<p>Le fichier <strong>numpy/arrayobject.h</strong> qui définit l'API C/Python pour les
+tableaux numpy doit être inclu.</p>
+<p><strong>import_array()</strong> doit être appelé à l'initialisation du module.</p>
+<p>On supposera que le type des données du tableau numpy est <strong>double</strong>.</p>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Exercice 3</h2>
+
+<dl class="function">
+<dt id="c.PyArray_Check">
+<code class="descname">PyArray_Check</code><span class="sig-paren">(</span>op<span class="sig-paren">)</span></dt>
+<dd><p>Evaluates true if op is a Python object whose type is a sub-type of
+PyArray_Type.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.PyArrayObject.data">
+char *<code class="descname">PyArrayObject.data</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A pointer to the first element of the array. This pointer can (and
+normally should) be recast to the data type of the array.</p>
+</dd></dl>
+
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>Exercice 3</h2>
+
+<dl class="function">
+<dt id="c.PyArrayObject.nd">
+int <code class="descname">PyArrayObject.nd</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>An integer providing the number of dimensions for this array. When nd is
+0, the array is sometimes called a rank-0 array. Such arrays have
+undefined dimensions and strides and cannot be accessed. NPY_MAXDIMS is
+the largest number of dimensions for any array.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.PyArrayObject.dimensions">
+npy_intp <code class="descname">PyArrayObject.dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>An array of integers providing the shape in each dimension as long as nd
+geq 1. The integer is always large enough to hold a pointer on the
+platform, so the dimension size is only limited by memory.</p>
+</dd></dl>
+
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

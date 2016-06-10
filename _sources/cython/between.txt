@@ -1,0 +1,304 @@
+==============================================================================
+Entre C et Python
+==============================================================================
+
+Cython
+------------------------------------------------------------------------------
+
+* Cython est un langage entre C et Python
+* Apporte un typage statique comme en C à Python
+* Cython compile en C
+* Peut interfacer du code C/C++ externe
+* Largement utilisé, stable
+* Le code C généré est portable (GNU/Linux, Windows, OSX, Python 2, Python 3).
+
+mymath.pyx
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/0_mymath/mymath.pyx
+   :language: cython
+
+setup.py
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/0_mymath/setup.py
+   :language: python
+
+Utilisation
+------------------------------------------------------------------------------
+
+.. code-block:: bash
+
+   python setup.py build_ext --inplace
+
+.. literalinclude:: example/0_mymath/main.py
+   :language: python
+
+Explications
+------------------------------------------------------------------------------
+
+Le code C généré manipule des ``PyObject``, par exemple:
+
+.. code-block:: bash
+
+   __pyx_t_2 = PyNumber_Remainder(__pyx_v_a, __pyx_v_b)
+
+Cette fonction est fournit par l'API C de Python:
+
+.. c:function:: PyObject* PyNumber_Remainder(PyObject *o1, PyObject *o2)   
+
+   Return value: New reference.
+
+   Returns the remainder of dividing o1 by o2, or NULL on failure. This is
+   the equivalent of the Python expression o1 % o2.
+
+Exercice 0
+------------------------------------------------------------------------------
+
+Compiler et utiliser le module `mymath` avec Cython.
+
+* :download:`Télécharger l'exercice <../_static/example/cython-0_mymath.tar.gz>`
+
+Typage statique
+------------------------------------------------------------------------------
+
+Les variables **a**, **b** et **x** sont typées.
+
+.. literalinclude:: example/1_mymath/mymath.pyx
+   :language: cython
+
+Typage statique
+------------------------------------------------------------------------------
+
+Le code C généré manipule des entier C par exemple:
+
+.. code-block:: c
+
+   static CYTHON_INLINE int __Pyx_mod_int(int a, int b) {
+     int r = a % b;
+     r += ((r != 0) & ((r ^ b) < 0)) * b;
+     return r;
+   }
+   (...)
+   if (unlikely(__pyx_v_b == 0)) {
+     PyErr_SetString(PyExc_ZeroDivisionError,
+                     "integer division or modulo by zero");
+     {__pyx_filename = __pyx_f[0]; __pyx_lineno = 10;
+      __pyx_clineno = __LINE__;
+      goto __pyx_L1_error;}
+   }
+   __pyx_v_x = __Pyx_mod_int(__pyx_v_a, __pyx_v_b);
+
+Typage statique
+------------------------------------------------------------------------------
+
+Bien que manipulation des entiers C, l'opération modulo reste fidèle
+au comportement en pure Python:
+
+    * Une exception est lancée si le dénominateur est nul.
+    * En Python: 3 % -2 vaut -1
+    * En C: 3 % -2 vaut 1
+
+Cython étant un langage entre le Python et le C, on peut choisir le
+comportement C.
+
+Typage statique
+------------------------------------------------------------------------------
+
+On utilise la division (et le modulo) à la ``C``.
+
+.. literalinclude:: example/2_mymath/mymath.pyx
+   :language: cython
+
+Typage statique
+------------------------------------------------------------------------------
+
+Dans ce cas, le code généré par Cython contient simplement pour
+l'opération modulo:
+
+.. code-block:: c
+
+  __pyx_v_x = (__pyx_v_a % __pyx_v_b);
+
+On peut ainsi obtenir en Cython des performances semblables au C,
+mais il reste le surcoût d'appel de la fonction.
+
+Typage statique complet
+------------------------------------------------------------------------------
+
+On définit la fonction avec **cdef**, et on type la valeur de retour:
+
+.. literalinclude:: example/3_mymath/mymath.pyx
+   :language: cython
+
+.. rst-class:: scrollable-code
+
+Typage statique complet
+------------------------------------------------------------------------------
+
+.. literalinclude:: src/pgcd.c
+   :language: c
+
+Typage statique complet
+------------------------------------------------------------------------------
+
+Ce code n'est plus appelable depuis Python, seulement depuis C et Cython.
+
+Il faut créer un fichier de déclaration ``mymath.pxd``:
+
+.. literalinclude:: example/3_mymath/mymath.pxd
+   :language: cython
+
+Typage statique complet
+------------------------------------------------------------------------------
+
+On peut ``cimport``-er et utiliser la fonction depuis
+un fichier ``fraction``:
+
+.. literalinclude:: example/3_mymath/fraction.pyx
+   :language: cython
+
+Typage statique complet
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/3_mymath/main.py
+   :language: python
+
+.. code-block:: text
+
+   18   3
+   -- = -
+   42   7
+
+
+Typage statique complet
+------------------------------------------------------------------------------
+
+Gràce à ``cimport``, on peut appeler une fonction C créer en Cython
+sans surcoût:
+
+   * pas de conversion d'arguments
+   * pas d'appel à une fonction Python
+
+HTLM coloré
+------------------------------------------------------------------------------
+
+.. code-block:: bash
+
+    cython --annotate mymath.pyx
+
+.. figure:: images/annotate_yellow.png
+     :height: 10cm
+
+HTLM coloré
+------------------------------------------------------------------------------
+
+.. code-block:: bash
+
+    cython --annotate mymath.pyx
+
+.. figure:: images/annotate_yellow_expanded.png
+
+HTLM coloré
+------------------------------------------------------------------------------
+
+.. code-block:: bash
+
+    cython --annotate mymath.pyx
+
+.. figure:: images/annotate_blank.png
+     :height: 10cm
+
+cpdef
+------------------------------------------------------------------------------
+
+Une fonction peut être déclarée avec ``cpdef``:
+
+.. code-block:: python
+
+    cpdef int pgcd(int a, int b):
+
+Cela crée deux fonctions:
+
+    * Une fonction appelable depuis C/Cython
+    * Une fonction appelable depuis Python/Cython, et qui enrobe la première fonction.
+
+Interfaçage fonction C
+------------------------------------------------------------------------------
+
+pgcd.h :
+
+.. literalinclude:: example/5_mymath/pgcd.h
+   :language: c
+              
+pgcd.c
+
+Interfaçage fonction C
+------------------------------------------------------------------------------
+
+cmymath.pxd :
+
+.. literalinclude:: example/5_mymath/cmymath.pxd
+   :language: cython
+
+mymath.pyx :
+
+.. literalinclude:: example/5_mymath/mymath.pyx
+   :language: cython
+
+Bibliothèque standard C
+------------------------------------------------------------------------------
+
+Cython fournit une interface à la bibliothèque C standard, par exemple:
+
+.. code-block:: cython
+
+    from libc.math cimport sqrt
+
+ctypedef
+------------------------------------------------------------------------------
+
+Un type `C` peut être déclaré avec **ctypedef** :
+
+.. code-block:: cython
+
+    ctypedef unsigned long long ullong;
+
+cast
+------------------------------------------------------------------------------
+
+Une variable peut-être castée avec la syntaxe **<...>** :
+
+.. code-block:: cython
+
+    cdef int n = <int> sqrt(5)
+
+.. rst-class:: scrollable-code
+
+Exercice
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/0_factorize_number/factorize_integer.py
+   :language: cython
+
+Exercice
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/0_factorize_number/find_divider.py
+   :language: cython
+
+Exercice
+------------------------------------------------------------------------------
+
+* Optimiser la fonction **find_divider(number)** en typant statiquement les
+  variables (`unsigned long long`).
+* Utiliser les instructions de compilateur : 
+
+  * @cython.cdivision(True)
+  * @cython.boundscheck(False)
+  * @cython.wraparound(False)
+
+* utiliser la fonction sqrt de libc.math 
+
+* :download:`Télécharger l'exercice <../_static/example/cython-0_factorize_number.tar.gz>`
+* :download:`Télécharger la solution <../_static/example/cython-1_factorize_number.tar.gz>`

@@ -1,0 +1,42 @@
+==============================================================================
+Structures
+==============================================================================
+
+.. rst-class:: scrollable-code
+
+point.h
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/mygeom/point.h
+   :language: python
+
+.. rst-class:: scrollable-code
+
+point.c
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/mygeom/point.c
+   :language: python
+
+.. rst-class:: scrollable-code
+
+point.py
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/mygeom/point.py
+   :language: python
+
+demo.py
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/mygeom/demo.py
+   :language: python
+   :caption:
+
+Autre fonctionnalités
+------------------------------------------------------------------------------
+
+* Tableau C
+* Pointeur
+* conversion de type
+* callback

@@ -1,0 +1,99 @@
+==============================================================================
+Interfaçage de C++
+==============================================================================
+
+.. rst-class:: scrollable-code
+
+Entête C++ solver.hxx
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/solver/solver.hxx
+   :language: c++
+
+.. rst-class:: scrollable-code
+
+Déclaration Cython clinalg.pxd
+------------------------------------------------------------------------------
+
+Rend solver accessible depuis Cython
+
+.. literalinclude:: example/solver/clinalg.pxd
+   :language: cython
+
+.. rst-class:: scrollable-code
+
+Interface Python linalg.pyx
+------------------------------------------------------------------------------
+
+Rend solver accessible depuis Python
+
+.. literalinclude:: example/solver/linalg.pyx
+   :language: cython
+
+Script Python main.py
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/solver/main.py
+   :language: cython
+
+Comparaison avec SWIG
+------------------------------------------------------------------------------
+
+* Nécessite plus de code que SWIG (qui interface automatiquement)
+* Mais : l'interface est programmée en langage Cython, ce qui donne
+  une grande liberté
+
+Exercice
+------------------------------------------------------------------------------
+
+Interfacer la classe Mypair.
+
+* :download:`Télécharger l'exercice <../_static/example/cython-cxx_class_exercice.tar.gz>`
+* :download:`Télécharger la solution <../_static/example/cython-cxx_class_solution.tar.gz>`
+
+Surcharge de fonction (cfoo.hxx)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_overloaded/cfoo.hxx
+   :language: c
+
+Surcharge de fonction (cfoo.pxd)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_overloaded/cfoo.pxd
+   :language: cython
+
+Surcharge de fonction (foo.pyx)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_overloaded/foo.pyx
+   :language: cython
+
+.. rst-class:: scrollable-code
+
+Classes template (cpair.hxx)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_template_class/cpair.hxx
+   :language: cython
+
+Classes template (cpair.pxd)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_template_class/cpair.pxd
+   :language: cython
+
+Classes template (cpair.pyx)
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/cxx_template_class/pair.pyx
+   :language: cython
+
+Cython et C++
+------------------------------------------------------------------------------
+
+Cython supporte aussi:
+
+  - surcharge d'opérateurs (pas tous)
+  - bibliothèque standard C++
+  - les exceptions

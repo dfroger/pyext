@@ -1,0 +1,28 @@
+==============================================================================
+Conclusion
+==============================================================================
+
+Cython
+------------------------------------------------------------------------------
+
+Cython a encore d'autres caractéristiques intéressantes :
+
+   - debug
+   - prange
+   - profilage
+   - callback
+   - pyximport
+
+Comparaison SWIG et Cython
+------------------------------------------------------------------------------
+
+SWIG:
+
+  - génère des interfaces automatiquement
+  - pour de nombreux langage cibles
+  - très bon support du C++
+
+Cython:
+
+  - langage et compilateur entre le C et le Python
+  - plus facilement programmable que SWIG: langage Cython VS macros SWIG

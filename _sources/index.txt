@@ -1,0 +1,12 @@
+########################################
+Interfaçage de code C/C++ avec Python
+########################################
+
+.. toctree::
+  :maxdepth: 1
+
+  intro
+  c_api/index.rst
+  swig/index.rst
+  cython/index.rst
+  ctypes/index.rst

@@ -1,0 +1,67 @@
+****************************************
+Introduction
+****************************************
+
+Étendre Python
+----------------------------------------
+
+`Python`_ a été conçu pour être facilement `étendu`_ avec des
+fonctions écrites en C, C++ et Fortran.
+
+Il est donc également possible :
+
+  - D'appeler des **fonctions C déjà existante**.
+  - Moyennant l'écriture de **code d'interface**.
+
+API C/Python
+----------------------------------------
+
+Nous commencerons par écrire à la main une interface Python à un fonction C.
+
+- Examiner les grands principes de l'API C/Python.
+- Sujet technique.
+- Mais utile pour comprendre les outils par la suite.
+
+SWIG
+----------------------------------------
+
+- Scanne les fichiers d'entêtes.
+- Génère automatiquement une interface à une bibliothèque C/C++.
+- Nombreux langages cible: Androïd, Lua, Perl, PHP, Python, R, Tcl ...
+- Scripts SWIG basés sur des macros.
+
+Cython
+----------------------------------------
+
+- Un langage et un compilateur (vers `C`).
+- Langage créole : entre le C et le Python.
+- Peut être typé statiquement ou dynamiquement.
+- Adapté pour créer des API Pythonic.
+
+ctypes
+----------------------------------------
+
+En pure Python, appelle directement une bibliothèque compilée.
+
+Notes
+----------------------------------------
+
+- Pas exhaustif (demenderait beaucoup de temps).
+- Faciliter la prise en main des outils.
+- Pas abordés:
+
+  - `SIP` 
+  - `Boost.Python`.
+
+.. _Python: http://www.python.org
+.. _étendu: http://docs.python.org/3.5/extending/index.html
+
+Dépendences
+----------------------------------------
+
+Pour executer les exemples, installer les dépendences suivantes:
+
+.. code-block:: bash
+
+   conda create -n pyext python=3.5 swig cython ipython
+   source activate pyext

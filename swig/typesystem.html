@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Système de type à l&#39;exécution &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="../index.html" />
+    <link rel="up" title="SWIG" href="index.html" />
+    <link rel="next" title="Strategie de compilation" href="compilation.html" />
+    <link rel="prev" title="Fonctionnement de SWIG" href="fonctionnement.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="systeme-de-type-a-l-execution">
+
+<h1>Système de type à l'exécution</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="exemple">
+
+<h2>Exemple</h2>
+
+<p>Supposons que l'on implémente un solveur de système linéaire.</p>
+<p>Supposons que l'on se base sur une bibliothèque externe de vecteurs et de matrices:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Implémente une classe <code class="docutils literal"><span class="pre">SomeMatrix</span></code>.</li>
+<li>Stocke un tableau 2D en mémoire contigüe.</li>
+<li>Définie quelques méthodes.</li>
+</ul>
+</div></blockquote>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="somematrix-hxx">
+
+<h2>somematrix.hxx</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#ifndef SOME_MATRIX_HXX</span>
+<span class="cp">#define SOME_MATRIX_HXX</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="n">class</span> <span class="n">SomeMatrix</span> <span class="p">{</span>
+    <span class="nl">public</span><span class="p">:</span>
+        <span class="n">SomeMatrix</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">nrow</span><span class="p">,</span>
+                   <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">ncol</span><span class="p">);</span>
+        <span class="o">~</span><span class="n">SomeMatrix</span><span class="p">();</span>
+        <span class="kt">double</span><span class="o">*</span> <span class="nf">get_data</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="n">m_data</span><span class="p">;};</span>
+        <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">get_nrow</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="n">m_nrow</span><span class="p">;};</span>
+        <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">get_ncol</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="n">m_ncol</span><span class="p">;};</span>
+        <span class="kt">void</span> <span class="nf">display</span><span class="p">();</span>
+        <span class="kt">double</span> <span class="nf">compute_something</span><span class="p">();</span>
+    <span class="nl">private</span><span class="p">:</span>
+        <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">m_nrow</span><span class="p">,</span> <span class="n">m_ncol</span><span class="p">;</span>
+        <span class="kt">double</span> <span class="o">*</span><span class="n">m_data</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="somematrix-cxx">
+
+<h2>somematrix.cxx</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;somematrix.hxx&quot;</span><span class="cp"></span>
+
+<span class="n">SomeMatrix</span><span class="o">::</span><span class="n">SomeMatrix</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">nrow</span><span class="p">,</span>
+                       <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">ncol</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">m_nrow</span><span class="p">(</span><span class="n">nrow</span><span class="p">),</span>
+    <span class="n">m_ncol</span><span class="p">(</span><span class="n">ncol</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">m_nrow</span> <span class="o">=</span> <span class="n">nrow</span><span class="p">;</span>
+    <span class="n">m_ncol</span> <span class="o">=</span> <span class="n">ncol</span><span class="p">;</span>
+    <span class="n">m_data</span> <span class="o">=</span> <span class="n">new</span> <span class="kt">double</span><span class="p">[</span><span class="n">nrow</span><span class="o">*</span><span class="n">ncol</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="n">SomeMatrix</span><span class="o">::~</span><span class="n">SomeMatrix</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">delete</span><span class="p">[]</span> <span class="n">m_data</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">SomeMatrix</span><span class="o">::</span><span class="n">display</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">irow</span><span class="o">=</span><span class="mi">0</span> <span class="p">;</span> <span class="n">irow</span><span class="o">&lt;</span><span class="n">m_nrow</span> <span class="p">;</span> <span class="n">irow</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;row &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">irow</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;:&quot;</span>  <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">icol</span><span class="o">=</span><span class="mi">0</span> <span class="p">;</span> <span class="n">icol</span><span class="o">&lt;</span><span class="n">m_ncol</span> <span class="p">;</span> <span class="n">icol</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">m_data</span><span class="p">[</span><span class="n">irow</span><span class="o">*</span><span class="n">m_ncol</span> <span class="o">+</span> <span class="n">icol</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &quot;</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">double</span> <span class="n">SomeMatrix</span><span class="o">::</span><span class="n">compute_something</span><span class="p">()</span> 
+<span class="p">{</span>
+    <span class="k">return</span> <span class="mf">3.1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="solver-hxx">
+
+<h2>solver.hxx</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#ifndef SOLVER_HXX</span>
+<span class="cp">#define SOLVER_HXX</span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;somematrix.hxx&quot;</span><span class="cp"></span>
+
+<span class="k">typedef</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">IndexType</span><span class="p">;</span>
+
+<span class="n">class</span> <span class="n">Solver</span> <span class="p">{</span>
+    <span class="nl">public</span><span class="p">:</span>
+        <span class="n">Solver</span><span class="p">(</span><span class="n">IndexType</span> <span class="n">n</span><span class="p">);</span>
+        <span class="o">~</span><span class="n">Solver</span><span class="p">();</span>
+        <span class="n">SomeMatrix</span><span class="o">*</span> <span class="nf">get_A</span><span class="p">(){</span><span class="k">return</span> <span class="n">m_A</span><span class="p">;};</span>
+        <span class="kt">void</span> <span class="nf">display</span><span class="p">();</span>
+    <span class="nl">private</span><span class="p">:</span>
+        <span class="n">IndexType</span> <span class="n">m_n</span><span class="p">;</span>
+        <span class="n">SomeMatrix</span><span class="o">*</span> <span class="n">m_A</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="solver-cxx">
+
+<h2>solver.cxx</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;solver.hxx&quot;</span><span class="cp"></span>
+
+<span class="n">Solver</span><span class="o">::</span><span class="n">Solver</span><span class="p">(</span><span class="n">IndexType</span> <span class="n">n</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">m_n</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">m_A</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SomeMatrix</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">Solver</span><span class="o">::~</span><span class="n">Solver</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">delete</span> <span class="n">m_A</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">Solver</span><span class="o">::</span><span class="n">display</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">m_A</span><span class="o">-&gt;</span><span class="n">display</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">6</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="util-hxx">
+
+<h2>util.hxx</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#ifndef UTIL_HXX</span>
+<span class="cp">#define UTIL_HXX</span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;somematrix.hxx&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;solver.hxx&quot;</span><span class="cp"></span>
+
+<span class="kt">void</span> <span class="nf">set_matrix_value</span><span class="p">(</span><span class="n">SomeMatrix</span><span class="o">*</span> <span class="n">A</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">set_element_to_zero</span><span class="p">(</span><span class="n">SomeMatrix</span><span class="o">*</span> <span class="n">A</span><span class="p">,</span>
+                         <span class="n">IndexType</span> <span class="n">irow</span><span class="p">,</span>
+                         <span class="n">IndexType</span> <span class="n">icol</span><span class="p">);</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">7</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="util-cxx">
+
+<h2>util.cxx</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;util.hxx&quot;</span><span class="cp"></span>
+
+<span class="kt">void</span> <span class="nf">set_matrix_value</span><span class="p">(</span><span class="n">SomeMatrix</span><span class="o">*</span> <span class="n">A</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="n">A</span><span class="o">-&gt;</span><span class="n">get_data</span><span class="p">();</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">IndexType</span> <span class="n">irow</span><span class="o">=</span><span class="mi">0</span> <span class="p">;</span> <span class="n">irow</span><span class="o">&lt;</span><span class="n">A</span><span class="o">-&gt;</span><span class="n">get_nrow</span><span class="p">()</span> <span class="p">;</span> <span class="n">irow</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">IndexType</span> <span class="n">icol</span><span class="o">=</span><span class="mi">0</span> <span class="p">;</span> <span class="n">icol</span><span class="o">&lt;</span><span class="n">A</span><span class="o">-&gt;</span><span class="n">get_ncol</span><span class="p">()</span> <span class="p">;</span> <span class="n">icol</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">*</span><span class="p">(</span><span class="n">data</span><span class="o">++</span><span class="p">)</span> <span class="o">=</span> <span class="n">irow</span><span class="o">*</span><span class="mi">10</span> <span class="o">+</span> <span class="n">icol</span><span class="p">;</span>
+    <span class="p">}}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">set_element_to_zero</span><span class="p">(</span><span class="n">SomeMatrix</span><span class="o">*</span> <span class="n">A</span><span class="p">,</span>
+                         <span class="n">IndexType</span> <span class="n">irow</span><span class="p">,</span>
+                         <span class="n">IndexType</span> <span class="n">icol</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">double</span><span class="o">*</span> <span class="n">data</span> <span class="o">=</span> <span class="n">A</span><span class="o">-&gt;</span><span class="n">get_data</span><span class="p">();</span>
+    <span class="n">IndexType</span> <span class="n">ncol</span> <span class="o">=</span> <span class="n">A</span><span class="o">-&gt;</span><span class="n">get_ncol</span><span class="p">();</span>
+    <span class="n">data</span><span class="p">[</span><span class="n">irow</span><span class="o">*</span><span class="n">ncol</span> <span class="o">+</span> <span class="n">icol</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">8</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="main">
+
+<h2>main</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;solver.hxx&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;util.hxx&quot;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">;</span>
+    <span class="n">Solver</span> <span class="n">solver</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+    <span class="n">set_matrix_value</span><span class="p">(</span> <span class="n">solver</span><span class="p">.</span><span class="n">get_A</span><span class="p">()</span> <span class="p">);</span>
+    <span class="n">set_element_to_zero</span><span class="p">(</span><span class="n">solver</span><span class="p">.</span><span class="n">get_A</span><span class="p">(),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="n">solver</span><span class="p">.</span><span class="n">display</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">9</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="solver-i">
+
+<h2>solver.i</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">module</span> <span class="n">solver</span>
+
+<span class="o">%</span><span class="p">{</span>
+<span class="cp">#include</span> <span class="cpf">&quot;solver.hxx&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;util.hxx&quot;</span><span class="cp"></span>
+<span class="o">%</span><span class="p">}</span>
+
+<span class="o">%</span><span class="n">include</span> <span class="s">&quot;util.hxx&quot;</span>
+<span class="o">%</span><span class="n">include</span> <span class="s">&quot;solver.hxx&quot;</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">10</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="setup-py">
+
+<h2>setup.py</h2>
+
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
+
+<span class="n">solver</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span>
+        <span class="s1">&#39;_solver&#39;</span><span class="p">,</span>
+        <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;solver.i&#39;</span><span class="p">,</span><span class="s1">&#39;solver.cxx&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;util.cxx&#39;</span><span class="p">,</span><span class="s1">&#39;somematrix/somematrix.cxx&#39;</span><span class="p">],</span>
+        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;somematrix&#39;</span><span class="p">],</span>
+        <span class="n">swig_opts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-c++&#39;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+<span class="n">setup</span> <span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;solver&#39;</span><span class="p">,</span>
+       <span class="n">ext_modules</span> <span class="o">=</span> <span class="p">[</span><span class="n">solver</span><span class="p">,],</span>
+       <span class="n">py_modules</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;solver&#39;</span><span class="p">],</span>
+       <span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">11</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>setup.py</h2>
+
+<p>Après avoir construit le module Python:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>python setup.py build_ext --inplace
+</pre></div>
+</div>
+<p>Nous pouvons l'importer et utiliser les fonctions de <code class="docutils literal"><span class="pre">Solver</span></code> et de support:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">solver</span> <span class="kn">as</span> <span class="nn">slv</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">solver</span> <span class="o">=</span> <span class="n">slv</span><span class="o">.</span><span class="n">Solver</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">slv</span><span class="o">.</span><span class="n">set_matrix_value</span><span class="p">(</span> <span class="n">solver</span><span class="o">.</span><span class="n">get_A</span><span class="p">()</span> <span class="p">)</span>
+<span class="n">slv</span><span class="o">.</span><span class="n">set_element_to_zero</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">get_A</span><span class="p">(),</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">solver</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">12</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="syteme-de-type-a-l-execution">
+
+<h2>Sytème de type à l'exécution</h2>
+
+<ul class="simple">
+<li>SWIG ne génère pas d'interface pour la classe <code class="docutils literal"><span class="pre">SomeMatrix</span></code>. En fait, SWIG
+n'a aucune information sur le contenu des fichiers
+<code class="docutils literal"><span class="pre">somematrix/somematrix.cxx</span></code> et <code class="docutils literal"><span class="pre">somematrix/somematrix.hxx</span></code>.</li>
+<li>SWIG est capable de passer en argument de fonction une variable de type
+<code class="docutils literal"><span class="pre">SomeMatrix</span></code>, bien que SWIG ne sache pas ce que <code class="docutils literal"><span class="pre">SomeMatrix</span></code> est.</li>
+</ul>
+
+
+
+<div class="slide-no">13</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="matrice-a">
+
+<h2>Matrice A</h2>
+
+<p>L'affichage de la matrice A produit:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>&lt;Swig Object of <span class="nb">type</span> <span class="s1">&#39;SomeMatrix *&#39;</span> at 0x7fcd7a9de2a0&gt;
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">14</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="systeme-de-type">
+
+<h2>Système de type</h2>
+
+<p>Tout ce qui n'est pas:</p>
+<blockquote>
+<div><ul class="simple">
+<li>un type de base,</li>
+<li>un <code class="docutils literal"><span class="pre">struct</span></code></li>
+<li>une <code class="docutils literal"><span class="pre">class</span></code></li>
+<li>un tableau</li>
+</ul>
+</div></blockquote>
+<p>Va être manipulé par SWIG comme un pointeur, avec une vérification du type
+à l'exécution.</p>
+<p>SWIG a résolu le <code class="docutils literal"><span class="pre">typedef</span></code> (argument <code class="docutils literal"><span class="pre">IndexType</span></code> de
+<code class="docutils literal"><span class="pre">set_element_to_zero</span></code>).</p>
+
+
+
+<div class="slide-no">15</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Système de type</h2>
+
+<p>Par exemple:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">slv</span><span class="o">.</span><span class="n">set_matrix_value</span><span class="p">(</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]]</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>produit une exception:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s2">&quot;main.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">5</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+    <span class="n">slv</span><span class="o">.</span><span class="n">set_matrix_value</span><span class="p">(</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]]</span> <span class="p">)</span>
+<span class="ne">TypeError</span><span class="p">:</span> <span class="ow">in</span> <span class="n">method</span> <span class="s1">&#39;set_matrix_value&#39;</span><span class="p">,</span> <span class="n">argument</span> <span class="mi">1</span> <span class="n">of</span> <span class="nb">type</span> <span class="s1">&#39;SomeMatrix *&#39;</span>
+</pre></div>
+</div>
+<p>SWIG ne sait pas ce qu'est une <code class="docutils literal"><span class="pre">SomeMatrix</span></code>, mais il est capable de savoir
+que quelque chose n'est pas une <code class="docutils literal"><span class="pre">SomeMatrix</span></code>.</p>
+
+
+
+<div class="slide-no">16</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>Système de type</h2>
+
+<p>Bien sûr, il n'est pas possible d'appeler les méthodes de <code class="docutils literal"><span class="pre">SomeMatrix</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">A</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s2">&quot;main2.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">9</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+<span class="ne">AttributeError</span><span class="p">:</span> <span class="s1">&#39;SwigPyObject&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;display&#39;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">A</span></code> est un objet SWIG qui enrobe un pointeur avec des informations sur le type,
+mais pas une vrai interface à <code class="docutils literal"><span class="pre">SomeMatrix</span></code>.</p>
+
+
+
+<div class="slide-no">17</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="exercice">
+
+<h2>Exercice</h2>
+
+<p>Créer une interface Python pour la fonction <code class="docutils literal"><span class="pre">pgcd</span></code> :</p>
+<div class="literal-block-wrapper container" id="example-pgcd-pgcd-h">
+<div class="code-block-caption"><span class="caption-text">example/pgcd/pgcd.h</span></div>
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#ifndef PGCD_H</span>
+<span class="cp">#define PGCD_H</span>
+
+<span class="kt">int</span> <span class="nf">pgcd</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">);</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</div>
+
+
+
+<div class="slide-no">18</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id4">
+
+<h2>Exercice</h2>
+
+<div class="literal-block-wrapper container" id="example-pgcd-pgcd-c">
+<div class="code-block-caption"><span class="caption-text">example/pgcd/pgcd.c</span></div>
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;pgcd.h&quot;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">pgcd</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">a</span><span class="o">==</span><span class="mi">0</span> <span class="o">||</span> <span class="n">b</span><span class="o">==</span><span class="mi">0</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">x</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">&gt;</span><span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">while</span> <span class="p">(</span> <span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">a</span><span class="o">%</span><span class="n">b</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">b</span><span class="p">;</span>
+<span class="p">};</span>
+
+</pre></div>
+</div>
+</div>
+
+
+
+<div class="slide-no">19</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id5">
+
+<h2>Exercice</h2>
+
+<ul class="simple">
+<li><a class="reference download internal" href="../_downloads/swig-pgcd.tar.gz" download=""><code class="xref download docutils literal"><span class="pre">Télécharger</span> <span class="pre">la</span> <span class="pre">solution</span></code></a></li>
+</ul>
+
+
+
+<div class="slide-no">20</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

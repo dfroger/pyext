@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Fonctions d&#39;extension de Python &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="../index.html" />
+    <link rel="up" title="API C/Python" href="index.html" />
+    <link rel="next" title="Gestion des erreurs" href="error.html" />
+    <link rel="prev" title="Modules Python" href="module.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="fonctions-d-extension-de-python">
+
+<h1>Fonctions d'extension de Python</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="fonction-d-extension-de-python">
+
+<h2>Fonction d'extension de Python</h2>
+
+<p>Une fonction qui étend les possiblités de Python</p>
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+<span class="n">foo</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">self</span></code> : si function: le module courant, si méthode: l'instance de objet.</li>
+<li><code class="docutils literal"><span class="pre">args</span></code> : les arguments. exemple : <cite>foo(a,b)</cite></li>
+<li><code class="docutils literal"><span class="pre">kwargs</span></code> : les arguments par mots clefs. exemple :
+<code class="docutils literal"><span class="pre">foo(a,b,x=0,y=[1,2,3])</span></code></li>
+</ul>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="extraction-des-arguments">
+
+<h2>Extraction des arguments</h2>
+
+<p>La fonction <code class="docutils literal"><span class="pre">PyArg_ParseTuple</span></code> extrait les variables C de <code class="docutils literal"><span class="pre">PyObject</span> <span class="pre">*args</span></code>.</p>
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">foo</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">;</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">s</span><span class="p">;</span>
+    <span class="n">ok</span> <span class="o">=</span> <span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s">&quot;iis&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">j</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">s</span><span class="p">);</span>
+    <span class="c1">// utilise i, j et s.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Pour récupérer un <strong>PyObject *</strong> (par exemple, une liste Python), on utilise
+la lettre <strong>O</strong>.</p>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="exemple-de-module-d-extension">
+
+<h2>Exemple de module d'extension</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;Python.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;math.h&quot;</span><span class="cp"></span>
+
+<span class="kt">double</span> <span class="nf">square</span><span class="p">(</span><span class="kt">double</span> <span class="n">number</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">number</span><span class="o">*</span><span class="n">number</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">mymath_square</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">double</span> <span class="n">number</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">number_square</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="s">&quot;d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">number</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">number_square</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">number</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">PyFloat_FromDouble</span><span class="p">(</span><span class="n">number_square</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">PyMethodDef</span> <span class="n">MymathMethods</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+
+    <span class="p">{</span><span class="s">&quot;square&quot;</span><span class="p">,</span> <span class="n">mymath_square</span><span class="p">,</span> <span class="n">METH_VARARGS</span><span class="p">,</span>
+        <span class="s">&quot;Compute square of a number&quot;</span><span class="p">},</span>
+
+    <span class="p">{</span><span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">}</span> <span class="cm">/*Sentinel*/</span>
+<span class="p">};</span>
+
+<span class="k">static</span> <span class="k">struct</span> <span class="n">PyModuleDef</span> <span class="n">mymath</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">PyModuleDef_HEAD_INIT</span><span class="p">,</span>
+    <span class="s">&quot;mymath&quot;</span><span class="p">,</span> <span class="cm">/* name of the module */</span>
+    <span class="s">&quot;Mathematics module&quot;</span><span class="p">,</span> <span class="cm">/* module documentation */</span>
+    <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">MymathMethods</span>
+<span class="p">};</span>
+     
+<span class="n">PyMODINIT_FUNC</span>
+<span class="nf">PyInit_mymath</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">PyModule_Create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mymath</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="compiliation-et-utilisation">
+
+<h2>Compiliation et utilisation</h2>
+
+<p>Compilation à la main :</p>
+<p>(à titre d'exemple, la bonne façon de faire est d'utiliser <strong>distutils</strong>)</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>gcc <span class="sb">`</span>python3-config --cflags<span class="sb">`</span> -fPIC -c mymath.c
+gcc <span class="sb">`</span>python3-config --ldflags<span class="sb">`</span> -shared mymath.o -o mymath.so
+</pre></div>
+</div>
+<p>Utilisation :</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">mymath</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mymath</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="distutils">
+
+<h2>distutils</h2>
+
+<p>Le module <strong>distutils</strong> gère ces étapes de compilation de façon portable :</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
+
+<span class="n">mymath</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span>
+    <span class="s1">&#39;mymath&#39;</span><span class="p">,</span>
+    <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mymath.c&#39;</span><span class="p">,],</span>
+    <span class="p">)</span>
+
+<span class="n">setup</span> <span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;mymath&#39;</span><span class="p">,</span>
+    <span class="n">ext_modules</span> <span class="o">=</span> <span class="p">[</span><span class="n">mymath</span><span class="p">,],</span>
+    <span class="n">py_modules</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mymath&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">6</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="exercice">
+
+<h2>Exercice</h2>
+
+<p>Compiler et utiliser le module <strong>mymath</strong>.</p>
+<ul class="simple">
+<li><a class="reference download internal" href="../_downloads/c_api-square.tar.gz" download=""><code class="xref download docutils literal"><span class="pre">Télécharger</span> <span class="pre">l'exercice</span></code></a></li>
+</ul>
+
+
+
+<div class="slide-no">7</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

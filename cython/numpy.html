@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Utilisation de Numpy &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="../index.html" />
+    <link rel="up" title="Cython" href="index.html" />
+    <link rel="next" title="Conclusion" href="conclusion.html" />
+    <link rel="prev" title="Interfaçage de C++" href="cxx.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="utilisation-de-numpy">
+
+<h1>Utilisation de Numpy</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="memoryviews">
+
+<h2>Memoryviews</h2>
+
+<p>Objets qui implémente le buffer protocol</p>
+<blockquote>
+<div><ul class="simple">
+<li>pep 3118</li>
+<li>protocol C que peuvent implémenter les objets python</li>
+<li>permet de partage le mémoire d'un tableau sans copie</li>
+</ul>
+</div></blockquote>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>Memoryviews</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">example</span><span class="p">():</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;d&#39;</span><span class="p">)</span>
+    <span class="k">cdef</span> <span class="kt">double</span>[<span class="p">:]</span> <span class="n">memview</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="n">memview</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">1</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">double</span><span class="p">[:]</span> <span class="n">numbers</span><span class="p">):</span>
+    <span class="k">cdef</span> <span class="kt">double</span> <span class="nf">numbers_sum</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">numbers</span><span class="p">:</span>
+        <span class="n">numbers_sum</span> <span class="o">+=</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="n">n</span> <span class="o">/</span> <span class="n">numbers</span><span class="o">.</span><span class="n">size</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Memoryviews</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">import</span> <span class="nn">demo</span>
+
+<span class="n">demo</span><span class="o">.</span><span class="n">example</span><span class="p">()</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;d&#39;</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">demo</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="fonction-average-cmymath-h">
+
+<h2>fonction average (cmymath.h)</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="c">#ifndef AVERAGE_H</span>
+<span class="c">#define AVERAGE_H</span>
+
+<span class="n">double</span>
+<span class="n">average</span><span class="p">(</span><span class="n">double</span> <span class="o">*</span><span class="n">numbers_list</span><span class="p">,</span>
+        <span class="nb">unsigned</span> <span class="nb">int</span> <span class="n">size</span><span class="p">);</span>
+
+<span class="c">#endif</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="fonction-average-cmymath-pxd">
+
+<h2>fonction average (cmymath.pxd)</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">cdef</span> <span class="kr">extern</span> <span class="k">from</span> <span class="s">&quot;cmymath.h&quot;</span><span class="p">:</span>
+    <span class="n">double</span> <span class="n">average</span><span class="p">(</span><span class="n">double</span> <span class="o">*</span><span class="n">numbers_list</span><span class="p">,</span> <span class="nb">unsigned</span> <span class="nb">int</span> <span class="n">size</span><span class="p">);</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">6</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="fonction-average-mymath-pyx">
+
+<h2>fonction average (mymath.pyx)</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">cimport</span> <span class="nn">cmymath</span>
+
+<span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">double</span><span class="p">[:]</span> <span class="n">numbers_list</span><span class="p">):</span>
+    <span class="k">cdef</span> <span class="kt">double</span>* <span class="nf">data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">numbers_list</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">numbers_list</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">return</span> <span class="n">cmymath</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">7</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="example-0-cmymath-c">
+
+<h2>example 0 (cmymath.c)</h2>
+
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;cmymath.h&quot;</span><span class="cp"></span>
+
+<span class="kt">int</span>
+<span class="nf">almost_equal</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">array1</span><span class="p">,</span> <span class="kt">double</span><span class="o">*</span> <span class="n">array2</span><span class="p">,</span>
+             <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="kt">double</span> <span class="n">eps</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">diff</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span> <span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">n</span> <span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">fabs</span><span class="p">(</span> <span class="n">array1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">array2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="n">eps</span> <span class="p">)</span>
+            <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">8</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="example-0-cmymath-pxd">
+
+<h2>example 0 (cmymath.pxd)</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">cdef</span> <span class="kr">extern</span> <span class="k">from</span> <span class="s">&quot;cmymath.h&quot;</span><span class="p">:</span>
+    <span class="nb">int</span> <span class="n">almost_equal</span><span class="p">(</span><span class="n">double</span><span class="o">*</span> <span class="n">array1</span><span class="p">,</span> <span class="n">double</span><span class="o">*</span> <span class="n">array2</span><span class="p">,</span>
+                     <span class="nb">unsigned</span> <span class="nb">int</span> <span class="n">n</span><span class="p">,</span> <span class="n">double</span> <span class="n">eps</span><span class="p">);</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">9</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="example-0-mymath-pyx">
+
+<h2>example 0 (mymath.pyx)</h2>
+
+<div class="highlight-cython"><div class="highlight"><pre><span></span><span class="k">cimport</span> <span class="nn">cmymath</span>
+
+<span class="k">def</span> <span class="nf">almost_equal</span><span class="p">(</span><span class="n">double</span> <span class="p">[:]</span> <span class="n">array1</span><span class="p">,</span>
+                 <span class="n">double</span> <span class="p">[:]</span> <span class="n">array2</span><span class="p">,</span>
+                 <span class="n">double</span> <span class="n">eps</span><span class="p">):</span>
+    <span class="k">cdef</span> <span class="kt">double</span>* <span class="nf">data1</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">array1</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+    <span class="k">cdef</span> <span class="kt">double</span>* <span class="nf">data2</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">array2</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+    <span class="n">size1</span> <span class="o">=</span> <span class="n">array1</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">size2</span> <span class="o">=</span> <span class="n">array2</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">if</span> <span class="n">size1</span> <span class="o">!=</span> <span class="n">size2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Array have different size&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cmymath</span><span class="o">.</span><span class="n">almost_equal</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">data2</span><span class="p">,</span> <span class="n">size1</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">10</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="exercice">
+
+<h2>Exercice</h2>
+
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#ifndef VECTOR_HXX</span>
+<span class="cp">#define VECTOR_HXX</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Vector</span> <span class="p">{</span>
+    <span class="k">public</span><span class="o">:</span>
+        <span class="n">Vector</span><span class="p">(){};</span>
+        <span class="kt">void</span> <span class="nf">set_data</span><span class="p">(</span><span class="kt">double</span><span class="o">*</span> <span class="n">data</span><span class="p">){</span><span class="n">m_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">;};</span>
+        <span class="kt">void</span> <span class="nf">set_size</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">size</span><span class="p">){</span><span class="n">m_size</span> <span class="o">=</span> <span class="n">size</span><span class="p">;};</span>
+        <span class="kt">void</span> <span class="nf">display</span><span class="p">();</span>
+    <span class="k">private</span><span class="o">:</span>
+        <span class="kt">double</span><span class="o">*</span> <span class="n">m_data</span><span class="p">;</span>
+        <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">m_size</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">11</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>Exercice</h2>
+
+<p>Intefacer la classe <strong>Vector</strong>.</p>
+<ul class="simple">
+<li><a class="reference download internal" href="../_downloads/cython-myvector_exercice.tar.gz" download=""><code class="xref download docutils literal"><span class="pre">Télécharger</span> <span class="pre">l'exercice</span></code></a></li>
+<li><a class="reference download internal" href="../_downloads/cython-myvector_solution.tar.gz" download=""><code class="xref download docutils literal"><span class="pre">Télécharger</span> <span class="pre">la</span> <span class="pre">solution</span></code></a></li>
+</ul>
+
+
+
+<div class="slide-no">12</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

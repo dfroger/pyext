@@ -1,0 +1,84 @@
+==============================================================================
+Gestion des erreurs
+==============================================================================
+
+
+Gestion des erreurs
+----------------------------------------
+
+* Une fonction indique une erreur en renvoyant (habituellement) ``NULL``.
+* L'interpréteur va alors vérifier la présence d'exception.
+
+
+Exemple
+----------------------------------------
+
+.. literalinclude:: src/sqrt.c
+   :language: c
+
+Exercice 1
+----------------------------------------
+
+Rajouter la fonction ``sqrt`` au module Python ``mymath``.
+
+* :download:`Télécharger l'exercice <../_static/example/c_api-square.tar.gz>`
+* :download:`Télécharger la solution <../_static/example/c_api-sqrt.tar.gz>`
+
+Exercice 2
+----------------------------------------
+
+* Ajouter à ``mymath.c`` une fonction C ``average``.
+* Ajouter à ``mymath.c`` une fonction Python ``mymath_average``. Cette
+  fonction doit :
+
+  * Vérifier que les éléments sont des nombres.
+  * Copier les éléments dans un tableau C.
+
+:download:`Télécharger la solution <../_static/example/c_api-average.tar.gz>`
+
+Exercice 2
+----------------------------------------
+
+.. c:function:: int PyList_Check(PyObject *p)
+
+   Renvoie vrai si *p* est une objet liste, ou une instance d'un sous-type.
+
+.. c:function:: PyObject* PyList_GetItem(PyObject *list, Py_ssize_t index)
+
+   Return the object at position *index* in the list pointed to by *list*.  The
+   position must be positive, indexing from the end of the list is not
+   supported.  If *index* is out of bounds, return *NULL* and set an
+   :exc:`IndexError` exception.
+
+Exercice 2
+----------------------------------------
+
+.. c:function:: double PyFloat_AsDouble(PyObject *pyfloat)
+
+   Return a C :c:type:`double` representation of the contents of *pyfloat*.  If
+   *pyfloat* is not a Python floating point object but has a :meth:`__float__`
+   method, this method will first be called to convert *pyfloat* into a float.
+   This method returns ``-1.0`` upon failure, so one should call
+   :c:func:`PyErr_Occurred` to check for errors.
+
+.. c:function:: PyObject* PyFloat_FromDouble(double v)
+
+   Create a :c:type:`PyFloatObject` object from *v*, or *NULL* on failure.
+
+Exercice 2
+----------------------------------------
+
+.. c:function:: Py_ssize_t PyList_Size(PyObject *list)
+
+   .. index:: builtin: len
+
+   Return the length of the list object in *list*; this is equivalent to
+   ``len(list)`` on a list object.
+
+.. c:function:: PyObject* PyErr_Occurred()
+
+   Test whether the error indicator is set.  If set, return the exception *type*
+   (the first argument to the last call to one of the :c:func:`PyErr_Set\*`
+   functions or to :c:func:`PyErr_Restore`).  If not set, return *NULL*.  You do not
+   own a reference to the return value, so you do not need to :c:func:`Py_DECREF`
+   it.

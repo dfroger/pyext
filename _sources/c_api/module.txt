@@ -1,0 +1,32 @@
+========================================
+Modules Python
+========================================
+
+Modules Python
+----------------------------------------
+
+Un module peut être écrit:
+
+* En langage Python pur
+* En **langage compilé** (Fortran, C, C++), puis compilé dans une
+  bibliothèque dynamique
+
+Exemple de bibliothèque dynamique :
+    - ``libfoo.so``.
+    - Peut être importée depuis Python:
+      
+      .. code-block:: python
+
+          import foo
+
+    - De la même manière qu'un module `foo.py`.
+
+Implémentation C d'un module Python
+----------------------------------------
+
+* Définir une fonction d'initialiation **PyInit_<modulename>**
+
+* Cette fonction est appelée quand Python importe le module, et:
+
+    * Appelle **PyModule_Create** pour créer l'object module et le retourne.
+    * Cet objet module contient notamment la **table des méthodes du module**.

@@ -1,0 +1,407 @@
+==============================================================================
+Les typemaps
+==============================================================================
+
+Retour sur l'exemple ``SomeMatrix``
+------------------------------------------------------------------------------
+
+Dans l'exemple précédent, nous avons généré une interface pour la classe
+``Solver`` et les fonctions support de ``utils.hxx``, sans avoir interfacer la
+classe ``SomeMatrix``.
+
+Script SWIG modifié
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/solver/solver.i
+   :language: swig
+
+Test
+------------------------------------------------------------------------------
+
+.. code-block:: python
+
+    import solver as slv
+
+    n = 4
+    A = slv.SomeMatrix(n,n)
+    print(A)
+
+SWIG a généré une interface
+------------------------------------------------------------------------------
+
+Le matrice n'est plus juste un objet SWIG contenant des informations de type:
+
+.. code-block:: python
+
+    <Swig Object of type 'SomeMatrix *' at 0x7fcd7a9de2a0>
+
+Mais une interface vers l'objet C++ correspondant:
+
+.. code-block:: python
+
+    <solver.SomeMatrix; proxy of <Swig Object of type 'SomeMatrix *' at 0x7fc97c177f30> >
+
+SWIG a généré une interface
+------------------------------------------------------------------------------
+
+Cela marche bien:
+
+.. code-block:: python
+
+    import solver as slv
+    n = 4
+    A = slv.SomeMatrix(n,n)
+    slv.set_matrix_value(A)
+    A.display()
+    
+Interfacer un tableau
+------------------------------------------------------------------------------
+
+Excepté si l'on veut récupérer les valeurs de la matrice:
+
+.. code-block:: python
+
+    data = A.get_data()
+    print(data)
+    <Swig Object of type 'double *' at 0x7f87b88162a0>
+
+Nous récupérons seulement un objet SWIG, qui sait que le type ``C`` est ``'double *'``.
+
+Interfacer un tableau
+------------------------------------------------------------------------------
+
+On s'attendrait à recevoir par exemple un tableau Numpy, ce qui va demander un
+peu plus de travail. Pour générer une interface à ``get_data``, la seule
+information que SWIG a est la définition de la méthode C++:
+
+.. code-block:: c
+
+    double* get_data() {return m_data;};
+
+qui ne dis pas si la valeur retournée est un scalaire, ou un tableau. Si oui,
+de quelle dimension?
+
+Typemap
+------------------------------------------------------------------------------
+
+Pour permette à l'utilisateur de personnaliser la conversion entre les types
+C/C++ et Python, SWIG a une fonctionnalité appelée ``typemap``. Typemap sont
+des morceaux de code qui sont insérés dans le code d'interface généré,
+remplaçant le fonctionnement par défaut.
+
+Il y a différent sorte de typemap, selon ce que l'on veut faire. Par exemple:
+
+* **in** : converti les arguments Python -> C
+
+* **out** : converti les arguments C -> Python
+
+Exemple d'utilisation de typemap in
+------------------------------------------------------------------------------
+
+Les typemaps pour les tableaux Numpy sont définis dans le fichier **numpy.i**
+distribué avec Numpy (et non avec SWIG). Ces typemaps permettent la
+conversions de tableau C/C++ en tableau Numpy et vice-versa.
+
+mymath.h
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/typemap_average/mymath.h
+   :language: c
+
+mymath.c
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/typemap_average/mymath.c
+   :language: c
+
+mymath.i
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/typemap_average/mymath.i
+   :language: swig
+
+Sans typemap
+------------------------------------------------------------------------------
+
+Sans appliquer le typemap, la fonction Python ``average`` ne pourrait
+pas prendre une liste (ou un tableau Numpy) en argument:
+
+.. code-block:: python
+
+    import mymath
+    mymath.average([1,2,3])
+    Traceback (most recent call last):
+      File "demo.py", line 3, in <module>
+        mymath.average([1,2,3])
+    TypeError: average() takes exactly 2 arguments (1 given)
+
+.. rst-class:: scrollable-code
+
+Fonction d'interface générée
+------------------------------------------------------------------------------
+
+.. code-block:: c
+
+    SWIGINTERN PyObject *
+    _wrap_average(PyObject *SWIGUNUSEDPARM(self),
+                  PyObject *args) {
+      PyObject *resultobj = 0;
+      double *arg1 = (double *) 0 ;
+      unsigned int arg2 ;
+      void *argp1 = 0 ;
+      int res1 = 0 ;
+      unsigned int val2 ;
+      int ecode2 = 0 ;
+      PyObject * obj0 = 0 ;
+      PyObject * obj1 = 0 ;
+      double result;
+
+      if (!PyArg_ParseTuple(args,(char *)"OO:average",
+                            &obj0,&obj1)) SWIG_fail;
+      res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_double, 0 |  0 );
+      if (!SWIG_IsOK(res1)) {
+        SWIG_exception_fail(SWIG_ArgError(res1), "in method '"
+            "average" "', argument " "1"" of type '" "double *""'");
+      }
+      arg1 = (double *)(argp1);
+      ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+      if (!SWIG_IsOK(ecode2)) {
+        SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '"
+            "average" "', argument " "2"" of type '" "unsigned int""'");
+      }
+      arg2 = (unsigned int)(val2);
+      result = (double)average(arg1,arg2);
+      resultobj = SWIG_From_double((double)(result));
+      return resultobj;
+    fail:
+      return NULL;
+    }
+
+Utilisation du typmap
+------------------------------------------------------------------------------
+
+Grâce au typemap Numpy, on va changer le type d'objet Python que la fonction
+``_wrap_average`` fonction attend, et qui est convertit en un pointeur vers
+un double et en entier C.
+
+Le typemap s'applique sur toutes fonctions qui ont dans leur arguments 
+``double* IN_ARRAY1, unsigned int DIM1``. La directive SWIG ``apply`` permet
+d'appliquer le typemap aux fonctions qui ont des arguments de nom différents.
+
+Après avoir appliquer le typemap, la fonction d'interface, qui prend bien
+en argument un tableau Numpy, est:
+
+.. rst-class:: scrollable-code
+
+Fonction d'interface générée, avec typemap
+------------------------------------------------------------------------------
+
+.. code-block:: c
+
+    SWIGINTERN PyObject *
+    _wrap_average(PyObject *SWIGUNUSEDPARM(self),
+                  PyObject *args)
+   {
+      PyObject *resultobj = 0;
+      double *arg1 = (double *) 0 ;
+      unsigned int arg2 ;
+      PyArrayObject *array1 = NULL ;
+      int is_new_object1 = 0 ;
+      PyObject * obj0 = 0 ;
+      double result;
+   
+      if (!PyArg_ParseTuple(args,(char *)"O:average",
+                            &obj0)) SWIG_fail;
+      {
+        npy_intp size[1] = {
+          -1 
+        };
+        array1 = obj_to_array_contiguous_allow_conversion(
+          obj0, NPY_DOUBLE, &is_new_object1);
+        if (!array1 || !require_dimensions(array1, 1) ||
+          !require_size(array1, size, 1)) SWIG_fail;
+        arg1 = (double*) array_data(array1);
+        arg2 = (int) array_size(array1,0);
+      }
+      result = (double)average(arg1,arg2);
+      resultobj = SWIG_From_double((double)(result));
+      {
+        if (is_new_object1 && array1)
+        {
+          Py_DECREF(array1); 
+        }
+      }
+      return resultobj;
+    fail:
+      {
+        if (is_new_object1 && array1)
+        {
+          Py_DECREF(array1); 
+        }
+      }
+      return NULL;
+    }
+
+Fichier numpy.i
+------------------------------------------------------------------------------
+
+Le fichier ``numpy.i`` débute avec des fonctions de support, contient ensuite
+le code des typemaps, et finalement génère les typemaps pour différents types.
+Examinons le typemap qui nous intéresse:
+
+.. rst-class:: scrollable-code
+
+Example de typemap
+------------------------------------------------------------------------------
+
+.. code-block:: swig
+
+    /* Typemap suite for (DATA_TYPE* IN_ARRAY1, DIM_TYPE DIM1)
+     */
+    %typecheck(SWIG_TYPECHECK_DOUBLE_ARRAY,
+               fragment="NumPy_Macros")
+      (DATA_TYPE* IN_ARRAY1, DIM_TYPE DIM1)
+    {
+      $1 = is_array($input) || PySequence_Check($input);
+    }
+    %typemap(in,
+             fragment="NumPy_Fragments")
+      (DATA_TYPE* IN_ARRAY1, DIM_TYPE DIM1)
+      (PyArrayObject* array=NULL, int is_new_object=0)
+    {
+      npy_intp size[1] = { -1 };
+      array = obj_to_array_contiguous_allow_conversion($input, DATA_TYPECODE,
+                                                       &is_new_object);
+      if (!array || !require_dimensions(array, 1) ||
+          !require_size(array, size, 1)) SWIG_fail;
+      $1 = (DATA_TYPE*) array_data(array);
+      $2 = (DIM_TYPE) array_size(array,0);
+    }
+    %typemap(freearg)
+      (DATA_TYPE* IN_ARRAY1, DIM_TYPE DIM1)
+    {
+      if (is_new_object$argnum && array$argnum)
+        { Py_DECREF(array$argnum); }
+    }
+
+Typemap
+------------------------------------------------------------------------------
+
+Les trois différents typemaps sont insérés (après expansion des macros), dans
+la fonction d'interface.
+
+Le typemap ``typecheck`` vérifie que l'argument d'entrée est soit un tableau
+Numpy, soit une séquence Python (tuple ou liste).
+
+Le typemap ``in`` crée un tableau de mémoire contigüe si nécessaire, vérifie
+les dimensions du tableau, extrait le pointeur vers les données et ses
+dimensions, et les passe comme arguments de la fonction ``average``.
+
+Le typemap ``freearg`` libère la mémoire si un tableau temporaire a été créée.
+
+Autres typemaps Numpy
+------------------------------------------------------------------------------
+
+En plus des typemaps pour les tableaux d'entrée, d'autres typemaps pour des
+tableaux utilisées en entrée/sortie (``inplace``), en sortie (``argout``,
+``argoutview``) sont disponibles, pour des tableaux 1D, 2D ou 3D (avec
+quelques restrictions pour les tableaux ``argout``), et pour les différents
+types de base.
+
+Directives SWIG %inline, %ignore, %rename, %extend
+------------------------------------------------------------------------------
+
+Les typemaps peuvent être appliqués pour les fonctions dont la liste des
+arguments contiennent successivement a pointeur sur un double et les
+entiers des dimensions (ou dans l'ordre inverse).
+
+Application des typemaps
+------------------------------------------------------------------------------
+
+Il arrive que le code C/C++ ne soit pas adapté à cette forme, et que les 
+typemaps ne puissent pas être appliqués directement. Par exemple, considérons
+la fonction:
+
+.. literalinclude:: example/typemap_numpy_helper_0/mymath.h 
+   :language: c
+
+Application des typemaps
+------------------------------------------------------------------------------
+
+Bien que le typemap puisse être appliqué sur ``(double* array2, unsigned int
+n)``, il ne peut pas être appliqué sur ``(double array1)``, à cause de la
+dimension manquante. Il est nécessaire d'écrire une fonction support sur
+laquelle appliqué le typemap.
+
+.. rst-class:: scrollable-code
+
+script SWIG
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/typemap_numpy_helper_0/mymath.i
+   :language: swig
+
+script SWIG
+------------------------------------------------------------------------------
+
+La directive SWIG **inline** permet d'ajouter du code C/C++ à la bibliothèque
+interfacée.  Ici, nous introduisons la fonction support
+``almost_equal_helper``, pour laquelle SWIG va générer une fonction
+d'interface. Comme la liste d'argument est réorganisée, les deux typemaps
+peuvent être appliqués avec les directives ``%apply``.
+
+De plus, nous utilisons la directive **%ignore** afin que SWIG ne génère pas
+d'interface pour la fonction ``almost_equal`` qui ne sera pas appelée
+directement.
+
+Enfin, nous utilisons la directive SWIG **%rename** pour renommer la fonction
+Python ``almost_equal_helper`` en ``almost_equal``.
+
+.. rst-class:: scrollable-code
+
+myvector.hxx
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/typemap_numpy_helper_1/myvector.hxx
+   :language: c
+
+myvector.cxx
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/typemap_numpy_helper_1/myvector.cxx
+   :language: c
+
+.. rst-class:: scrollable-code
+
+myvector.i
+------------------------------------------------------------------------------
+
+.. literalinclude:: example/typemap_numpy_helper_1/myvector.i
+   :language: swig
+
+myvector.i
+------------------------------------------------------------------------------
+
+utilise la directive SWIG *%extend* pour ajouter une nouvelle méthode à la
+classe ``Vector``, sur laquelle le typemap Numpy est appliqué.
+
+Options de debuggage
+------------------------------------------------------------------------------
+
+Les options de la ligne de commande suivantes peuvent être utilisées pour
+deboguer l'application des typemap:
+
++ ``-debug-typemap``
+
++ ``-debug-tmsearch``
+
++ ``-debug-tmused``
+
+Exercice
+------------------------------------------------------------------------------
+
+Modifier le script SWIG de l'exemple ``SomeMatrix`` pour que la fonction
+get_dat retourne un tableau Numpy.
+
+* :download:`Télécharger l'exercice <../_static/example/swig-solver.tar.gz>`
+* :download:`Télécharger la solution <../_static/example/swig-typemap_somematrix.tar.gz>`

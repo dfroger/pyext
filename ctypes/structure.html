@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Structures &mdash; Interfaçage de code C/C++ avec Python</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    
+    
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2016.03.02',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="top" title="Interfaçage de code C/C++ avec Python" href="../index.html" />
+    <link rel="up" title="ctypes" href="index.html" />
+    <link rel="prev" title="Utilisation de Numpy" href="numpy.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="structures">
+
+<h1>Structures</h1>
+
+
+
+
+<div class="slide-no">1</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="point-h">
+
+<h2>point.h</h2>
+
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#ifndef POINT_H_INCLUDED</span>
+<span class="c1">#define POINT_H_INCLUDED</span>
+
+<span class="n">typedef</span> <span class="n">struct</span> <span class="n">point</span> <span class="p">{</span>
+    <span class="n">double</span> <span class="n">x</span><span class="p">;</span>
+    <span class="n">double</span> <span class="n">y</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">Point</span><span class="p">;</span>
+
+<span class="n">Point</span><span class="o">*</span>
+<span class="n">point_new</span><span class="p">(</span><span class="n">double</span> <span class="n">x</span><span class="p">,</span> <span class="n">double</span> <span class="n">y</span><span class="p">);</span>
+
+<span class="n">void</span>
+<span class="n">point_destroy</span><span class="p">(</span><span class="n">Point</span><span class="o">*</span> <span class="n">const</span> <span class="n">point</span><span class="p">);</span>
+
+<span class="n">void</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Point</span> <span class="n">const</span> <span class="o">*</span> <span class="n">const</span> <span class="n">point</span><span class="p">);</span>
+
+<span class="n">double</span>
+<span class="n">distance</span><span class="p">(</span><span class="n">Point</span> <span class="n">const</span> <span class="o">*</span> <span class="n">const</span> <span class="n">A</span><span class="p">,</span> <span class="n">Point</span> <span class="n">const</span> <span class="o">*</span> <span class="n">const</span> <span class="n">B</span><span class="p">);</span>
+
+<span class="c1">#endif</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">2</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="point-c">
+
+<h2>point.c</h2>
+
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#include &lt;stdlib.h&gt;</span>
+<span class="c1">#include &lt;stdio.h&gt;</span>
+<span class="c1">#include &lt;math.h&gt;</span>
+
+<span class="c1">#include &quot;point.h&quot;</span>
+
+<span class="n">Point</span><span class="o">*</span>
+<span class="n">point_new</span><span class="p">(</span><span class="n">double</span> <span class="n">x</span><span class="p">,</span> <span class="n">double</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Point</span><span class="o">*</span> <span class="n">point</span> <span class="o">=</span> <span class="p">(</span><span class="n">Point</span><span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="n">sizeof</span><span class="p">(</span><span class="n">Point</span><span class="p">));</span>
+    <span class="n">point</span><span class="o">-&gt;</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+    <span class="n">point</span><span class="o">-&gt;</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">point</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">void</span>
+<span class="n">point_destroy</span><span class="p">(</span><span class="n">Point</span><span class="o">*</span> <span class="n">const</span> <span class="n">point</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">point</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">void</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Point</span> <span class="n">const</span> <span class="o">*</span> <span class="n">const</span> <span class="n">point</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;&lt;Point(</span><span class="si">%.2f</span><span class="s2"> </span><span class="si">%.2f</span><span class="s2">)&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">point</span><span class="o">-&gt;</span><span class="n">x</span><span class="p">,</span> <span class="n">point</span><span class="o">-&gt;</span><span class="n">y</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">double</span>
+<span class="n">distance</span><span class="p">(</span><span class="n">Point</span> <span class="n">const</span> <span class="o">*</span> <span class="n">const</span> <span class="n">A</span><span class="p">,</span> <span class="n">Point</span> <span class="n">const</span> <span class="o">*</span> <span class="n">const</span> <span class="n">B</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">double</span> <span class="n">xx</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">B</span><span class="o">-&gt;</span><span class="n">x</span> <span class="o">-</span> <span class="n">A</span><span class="o">-&gt;</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="n">double</span> <span class="n">yy</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">B</span><span class="o">-&gt;</span><span class="n">y</span> <span class="o">-</span> <span class="n">A</span><span class="o">-&gt;</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">xx</span> <span class="o">+</span> <span class="n">yy</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">3</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="scrollable-code slide level-2" id="point-py">
+
+<h2>point.py</h2>
+
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ctypes</span>
+
+<span class="n">c_geom</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="s2">&quot;./libgeom.so&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">CPoint</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span><span class="p">)]</span>
+
+<span class="k">class</span> <span class="nc">Point</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="n">point_new</span> <span class="o">=</span> <span class="n">c_geom</span><span class="o">.</span><span class="n">point_new</span>
+        <span class="n">point_new</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span><span class="p">]</span>
+        <span class="n">point_new</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">CPoint</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_c_point</span> <span class="o">=</span> <span class="n">point_new</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">display</span> <span class="o">=</span> <span class="n">c_geom</span><span class="o">.</span><span class="n">display</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">CPoint</span><span class="p">)]</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_c_point</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="n">c_geom</span><span class="o">.</span><span class="n">distance</span>
+        <span class="n">distance</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">CPoint</span><span class="p">),</span> 
+                             <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">CPoint</span><span class="p">)]</span>
+        <span class="n">distance</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span>
+        <span class="k">return</span> <span class="n">distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_c_point</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">_c_point</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">point_destroy</span> <span class="o">=</span> <span class="n">c_geom</span><span class="o">.</span><span class="n">point_destroy</span>
+        <span class="n">point_destroy</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">CPoint</span><span class="p">)]</span>
+        <span class="n">point_destroy</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">point_destroy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_c_point</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+<div class="slide-no">4</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="demo-py">
+
+<h2>demo.py</h2>
+
+<div class="literal-block-wrapper container" id="example-mygeom-demo-py">
+<div class="code-block-caption"><span class="caption-text">example/mygeom/demo.py</span></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">point</span> <span class="kn">import</span> <span class="n">Point</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">B</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+
+
+
+<div class="slide-no">5</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+<article class="slide level-2" id="autre-fonctionnalites">
+
+<h2>Autre fonctionnalités</h2>
+
+<ul class="simple">
+<li>Tableau C</li>
+<li>Pointeur</li>
+<li>conversion de type</li>
+<li>callback</li>
+</ul>
+
+
+
+<div class="slide-no">6</div>
+
+
+<div class="slide-footer"><a href=/index.html>Index</a>  |  <a href=/intro.html>Intro</a>  |  <a href=/c_api/index.html>C API</a>  |  <a href=/swig/index.html>SWIG</a>  |  <a href=/cython/index.html>Cython</a>  |  <a href=/ctypes/index.html>ctypes</a></div>
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>
